@@ -1,57 +1,81 @@
-# Generate Test Cases and Documentation
+# AI-Powered Test Case Generator
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Features](#features)
-3. [Project Structure](#project-structure)
-4. [Installation](#installation)
-5. [Usage](#usage)
+2. [Key Features](#key-features)
+3. [Architecture](#architecture)
+4. [Project Structure](#project-structure)
+5. [Installation](#installation)
 6. [Configuration](#configuration)
-7. [Data Structure](#data-structure)
-8. [API Integration](#api-integration)
-9. [Document Generation](#document-generation)
-10. [Development](#development)
-11. [Scripts](#scripts)
-12. [Dependencies](#dependencies)
-13. [Contributing](#contributing)
-14. [License](#license)
+7. [Usage](#usage)
+8. [Input Requirements](#input-requirements)
+9. [AI Integration](#ai-integration)
+10. [Output Formats](#output-formats)
+11. [Document Generation](#document-generation)
+12. [Development](#development)
+13. [Scripts](#scripts)
+14. [Dependencies](#dependencies)
+15. [Contributing](#contributing)
 
 ## Overview
 
-This TypeScript project automates the generation and management of test cases for Quality Assurance workflows. It provides functionality to:
+An intelligent TypeScript application that leverages AI to automatically generate comprehensive test cases from Excel requirements. The system uses **Groq AI** to analyze requirements and produce structured test cases in Gherkin format, supporting both TCMS integration and professional Word document generation.
 
-- Import test cases to a Test Case Management System (TCMS)
-- Generate professional Word documents (.docx) with formatted test cases
-- Merge new test cases with existing documentation
-- Support Gherkin format test case specifications
+This tool is specifically designed for QA Engineers working in agile environments who need to rapidly convert business requirements into executable test cases with complete coverage.
 
-The project is designed for QA Engineers working with API testing, particularly focusing on user registration and validation scenarios.
+## Key Features
 
-## Features
+- **🤖 AI-Powered Generation**: Uses Groq AI (GPT-OSS-20B) to intelligently create test cases from requirements
+- **📊 Excel Integration**: Reads requirements directly from Excel files with structured parsing
+- **🥒 Gherkin Format**: Generates BDD-style test cases with Given/When/Then structure
+- **📝 Dual Output**: Creates both TCMS-ready and documentation-ready formats
+- **📄 Professional Documentation**: Generates formatted Word documents with tables and styling
+- **🔄 Document Merging**: Combines new test cases with existing documentation
+- **🛠️ TCMS Integration**: Direct upload capability to Test Case Management Systems
+- **🎯 Comprehensive Coverage**: Ensures Happy Path, Edge Cases, and Negative scenarios
+- **🌐 Spanish Language Support**: All generated content in Spanish for localized teams
 
-- **Automated Test Case Import**: Upload test cases to TCMS via HTTP API
-- **Document Generation**: Create formatted Word documents with test case tables
-- **Document Merging**: Combine new test cases with existing documentation
-- **Gherkin Format Support**: Structured test cases following BDD practices
-- **TypeScript Implementation**: Type-safe development with modern ES modules
-- **Configurable Test Data**: Easily modify test cases and titles through data files
+## Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Excel File    │───▶│   AI Processor  │───▶│  Test Cases     │
+│ (Requirements)  │    │   (Groq API)    │    │ (Gherkin Format)│
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │
+                                ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   TCMS Upload   │◀───│   Dual Output   │───▶│  Word Document  │
+│   (HTTP API)    │    │   Generator     │    │  (Professional) │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
 
 ## Project Structure
 
 ```
 ├── src/
+│   ├── common/
+│   │   ├── utils/
+│   │   │   ├── doc-utils.ts         # Word document generation
+│   │   │   ├── groq-utils.ts        # AI integration with Groq
+│   │   │   ├── import-test-cases.ts # TCMS upload functionality
+│   │   │   ├── read-requirements.ts # Excel parsing utilities
+│   │   │   └── utils.ts             # General utilities
+│   │   ├── constants.ts             # Application constants
+│   │   └── types.ts                 # TypeScript type definitions
 │   ├── data/
-│   │   ├── data.ts          # Test case data for document generation
-│   │   ├── testcases.ts     # Test case data for TCMS import
-│   │   └── titles.ts        # Document section titles
-│   ├── doc-utils.ts         # Document generation utilities
-│   ├── import-test-cases.ts # TCMS import functionality
-│   └── index.ts            # Main application entry point
-├── original.docx           # Base document for merging
-├── package.json           # Project dependencies and scripts
-├── tsconfig.json          # TypeScript configuration
-└── prompts_unstyled.md    # QA Engineer profile and guidelines
+│   │   ├── data.ts                  # Sample test case data
+│   │   ├── prompts.ts               # AI prompt templates
+│   │   └── testcases.ts             # Static test case examples
+│   └── index.ts                     # Main application entry point
+├── requirements.xlsx                # Input requirements file
+├── template_requirements_example.xlsx # Template for requirements
+├── original.docx                   # Base document for merging
+├── final_document.docx             # Generated output document
+├── .env                           # Environment variables (API keys)
+├── package.json                   # Dependencies and scripts
+└── tsconfig.json                  # TypeScript configuration
 ```
 
 ## Installation
@@ -69,195 +93,271 @@ The project is designed for QA Engineers working with API testing, particularly 
    npm install
    ```
 
-3. **Build the project**:
+3. **Set up environment variables**:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your Groq API key
+   ```
+
+4. **Build the project**:
    ```bash
    npm run build
    ```
 
+## Configuration
+
+### Environment Variables
+
+Create a `.env` file with your Groq API credentials:
+
+```env
+GROQ_API_KEY=your_groq_api_key_here
+```
+
+### Requirements File
+
+Place your requirements in `requirements.xlsx` following this structure:
+
+| Módulo          | Descripción            | ID Requerimiento | Requerimiento                        | Consideración             |
+| --------------- | ---------------------- | ---------------- | ------------------------------------ | ------------------------- |
+| User Management | User registration flow | REQ-001          | Users must register with valid email | Email validation required |
+
+### Command Line Arguments
+
+The application supports command line arguments for TCMS integration:
+
+```bash
+npm start -- --product=1 --category=2
+```
+
 ## Usage
 
-### Running the Application
+### Basic Execution
 
-Execute the main workflow that imports test cases and generates documentation:
+Run the complete workflow:
 
 ```bash
 npm start
 ```
 
-This command will:
+This will:
 
-1. Import all test cases to the configured TCMS
-2. Generate a new Word document with formatted test cases
-3. Merge with existing documentation if `original.docx` exists
+1. Parse requirements from `requirements.xlsx`
+2. Send each requirement to Groq AI for test case generation
+3. Process AI responses and extract structured test cases
+4. Generate Word documentation (when enabled)
+5. Upload to TCMS (when configured)
 
 ### Development Mode
 
-For development with auto-rebuild on file changes:
+For development with auto-rebuild:
 
 ```bash
 npm run watch
 ```
 
-## Configuration
+### Custom Requirements File
 
-### TCMS Integration
+Specify a different requirements file:
 
-Configure the TCMS connection in `src/import-test-cases.ts`:
-
-```typescript
-const csrfmiddlewaretoken = "your-csrf-token";
-const csrftoken = "your-csrf-token";
-const default_tester = "your-username";
-const product_id = "1";
-const category_id = "1";
+```bash
+# Modify REQUIREMENTS_PATH in src/common/constants.ts
+export const REQUIREMENTS_PATH = "./custom-requirements.xlsx";
 ```
 
-### SSL Configuration
+## Input Requirements
 
-The application disables SSL verification for development:
+### Excel File Format
 
-```typescript
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+The system expects an Excel file with the following columns:
+
+- **Módulo**: Module or feature name (creates section headers)
+- **Descripción**: Brief description of the functionality
+- **ID Requerimiento**: Unique requirement identifier
+- **Requerimiento**: Detailed requirement description
+- **Consideración**: Additional considerations or constraints
+
+### Example Requirement
+
+```
+Módulo: Gestión de Usuarios
+Descripción: Registro de nuevos usuarios
+ID Requerimiento: REQ-001
+Requerimiento: El sistema debe permitir el registro de usuarios con email válido
+Consideración: Validar formato de email y unicidad
 ```
 
-**Note**: Remove this in production environments.
+## AI Integration
 
-## Data Structure
+### Groq AI Configuration
 
-### Test Case Format
-
-Test cases follow this structure:
-
-```typescript
-interface TestCase {
-  title: string; // Test case identifier and title
-  description: string; // Feature and scenario description
-  test_case: string; // Gherkin steps (Given/When/Then)
-  test_type: string; // Type: "Happy Path", "Validación Negativa", etc.
-  isFirst: boolean; // Indicates if this starts a new section
-}
-```
-
-### Example Test Case
+The system uses Groq's GPT-OSS-20B model with the following settings:
 
 ```typescript
 {
-  title: "[AUT:001] - Registrar usuario exitosamente con datos válidos",
-  description: "Feature: Registro de usuarios\nScenario: Registro exitoso con datos válidos",
-  test_case: "Given: El administrador tiene un usuario con datos válidos\nWhen: Se envía la petición POST al endpoint /api/v1/usuarios\nThen: El sistema guarda el usuario\nAnd: Devuelve una respuesta con estado 201",
-  test_type: "Happy Path",
-  isFirst: true
+  model: "openai/gpt-oss-20b",
+  temperature: 1,
+  max_completion_tokens: 8192,
+  reasoning_effort: "medium",
+  tool_choice: "auto"
 }
 ```
 
-## API Integration
+### AI Prompt Engineering
 
-### TCMS Upload
+The AI is configured with a specialized QA Engineer profile that:
 
-The system uploads test cases to a TCMS via HTTP POST requests with the following features:
+- Generates test cases exclusively in Spanish
+- Follows Gherkin BDD format (Given/When/Then)
+- Creates comprehensive coverage (Happy Path + Edge Cases + Negative scenarios)
+- Produces dual output formats for different use cases
+- Ensures minimum 10 test cases per requirement for thorough coverage
 
-- **Authentication**: Uses CSRF tokens and session cookies
-- **Batch Processing**: Processes multiple test cases sequentially
-- **Error Handling**: Provides detailed error messages for failed uploads
-- **Configurable Headers**: Supports custom request headers and cookies
+### Retry Mechanism
 
-### Request Format
+Built-in retry logic with exponential backoff:
 
-Test cases are submitted with these fields:
+- **Default retries**: 3 attempts
+- **Delay**: 2000ms between attempts
+- **Error handling**: Detailed logging and graceful degradation
 
-- Summary and description
-- Author and tester assignment
-- Product and category classification
-- Priority and status settings
-- Email notification preferences
+## Output Formats
+
+### Format 1: TCMS Integration
+
+```json
+[
+  {
+    "title": "[REQ-001] - Registrar usuario con email válido",
+    "content": "Feature: Registro de usuarios\nScenario: Registro exitoso\nGiven: Usuario con datos válidos\nWhen: Envía formulario de registro\nThen: Usuario se registra exitosamente\nTipo de test case: Happy Path"
+  }
+]
+```
+
+### Format 2: Documentation
+
+```json
+[
+  {
+    "title": "[REQ-001] - Registrar usuario con email válido",
+    "description": "Feature: Registro de usuarios\nScenario: Registro exitoso",
+    "test_case": "Given: Usuario con datos válidos\nWhen: Envía formulario de registro\nThen: Usuario se registra exitosamente",
+    "test_type": "Happy Path",
+    "isFirst": true
+  }
+]
+```
 
 ## Document Generation
 
 ### Word Document Features
 
-- **Professional Formatting**: Styled tables with headers and consistent layout
-- **Automatic Numbering**: Sequential test case IDs starting from 1228
-- **Section Organization**: Grouped by titles with heading styles
-- **Table Structure**: Each test case includes:
-  - ID header with blue background
-  - Title, Description, Test Case, and Test Type rows
+- **Professional Styling**: Blue headers with white text
+- **Structured Tables**: Each test case in a formatted table
+- **Sequential Numbering**: Auto-incrementing test case IDs
+- **Section Organization**: Module-based grouping with headings
+- **Merge Capability**: Combines with existing documentation
 
-### Document Merging
+### Document Structure
 
-The system can merge new test cases with existing documents:
+Each test case table includes:
 
-1. **Reads Original**: Loads existing `original.docx` file
-2. **Generates New Content**: Creates formatted test case tables
-3. **Merges Documents**: Combines content with page breaks
-4. **Preserves Formatting**: Maintains original document styling
-5. **Outputs Result**: Saves as `final_document.docx`
+| Field              | Description                                 |
+| ------------------ | ------------------------------------------- |
+| **ID**             | Sequential identifier with blue header      |
+| **Título**         | Test case title with requirement prefix     |
+| **Descripción**    | Feature and scenario description            |
+| **Caso de prueba** | Gherkin steps (Given/When/Then)             |
+| **Tipo de test**   | Test category (Happy Path, Edge Case, etc.) |
 
 ## Development
 
-### Code Quality
+### Code Quality Tools
 
-The project includes:
+- **ESLint**: Comprehensive linting with TypeScript support
+- **Prettier**: Consistent code formatting
+- **TypeScript**: Strict type checking enabled
+- **Modern ES Modules**: Latest JavaScript features
 
-- **ESLint**: Code linting with TypeScript support
-- **Prettier**: Code formatting
-- **TypeScript**: Type checking and modern JavaScript features
-- **Strict Mode**: Enhanced type safety
+### Architecture Patterns
 
-### Build Process
+- **Modular Design**: Separated utilities and concerns
+- **Type Safety**: Comprehensive TypeScript interfaces
+- **Error Handling**: Robust error management with retries
+- **Async/Await**: Modern asynchronous programming patterns
 
-Uses esbuild for fast compilation:
+### Testing Considerations
 
-- **Bundling**: Single output file generation
-- **External Dependencies**: Excludes Node.js built-ins and specific packages
-- **ES Modules**: Modern module format support
-- **Watch Mode**: Development-friendly auto-rebuild
+The application includes:
+
+- Input validation for Excel files
+- AI response validation
+- Document generation error handling
+- Network request retry mechanisms
 
 ## Scripts
 
-| Script          | Description                        |
-| --------------- | ---------------------------------- |
-| `npm start`     | Run the compiled application       |
-| `npm run build` | Build the project for production   |
-| `npm run watch` | Development mode with auto-rebuild |
-| `npm test`      | Run tests (placeholder)            |
+| Script    | Command         | Description                        |
+| --------- | --------------- | ---------------------------------- |
+| **Start** | `npm start`     | Run the compiled application       |
+| **Build** | `npm run build` | Build for production with esbuild  |
+| **Watch** | `npm run watch` | Development mode with auto-rebuild |
+| **Test**  | `npm test`      | Run test suite (placeholder)       |
 
 ## Dependencies
 
 ### Production Dependencies
 
-- **docx**: Word document generation and manipulation
-- **docxtemplater**: Document templating (if needed)
-- **pizzip**: ZIP file handling for DOCX manipulation
-- **node-fetch**: HTTP client for API requests
+| Package      | Purpose                                   |
+| ------------ | ----------------------------------------- |
+| **groq-sdk** | AI integration with Groq API              |
+| **docx**     | Word document generation and manipulation |
+| **pizzip**   | ZIP file handling for DOCX operations     |
+| **xlsx**     | Excel file reading and parsing            |
+| **dotenv**   | Environment variable management           |
+| **minimist** | Command line argument parsing             |
 
 ### Development Dependencies
 
-- **TypeScript**: Language and compiler
-- **esbuild**: Fast build tool
-- **ESLint**: Code linting
-- **Prettier**: Code formatting
+| Package                 | Purpose                           |
+| ----------------------- | --------------------------------- |
+| **typescript**          | Type checking and compilation     |
+| **esbuild**             | Fast bundling and compilation     |
+| **eslint**              | Code linting and quality          |
+| **prettier**            | Code formatting                   |
+| **@typescript-eslint/** | TypeScript-specific linting rules |
 
 ## Contributing
 
-1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/new-feature`
-3. **Make changes** and ensure code quality
-4. **Run tests** and verify functionality
-5. **Submit a pull request** with detailed description
+### Development Setup
 
-### Code Style
+1. **Fork and clone** the repository
+2. **Install dependencies**: `npm install`
+3. **Set up environment**: Copy `.env.example` to `.env`
+4. **Add API key**: Get Groq API key and add to `.env`
+5. **Run in development**: `npm run watch`
+
+### Code Standards
 
 - Follow TypeScript best practices
 - Use ESLint and Prettier configurations
-- Include type annotations for public APIs
+- Include comprehensive type annotations
 - Write descriptive commit messages
+- Test with sample requirements files
 
-## License
+### Pull Request Process
 
-This project is licensed under the ISC License. See the repository for more details.
+1. Create feature branch from main
+2. Implement changes with proper typing
+3. Test with sample Excel files
+4. Update documentation if needed
+5. Submit PR with detailed description
 
 ---
 
 **Repository**: [Generate-testcases-and-docs](https://github.com/Strako/Generate-testcases-and-docs)
 
 **Issues**: [Report bugs or request features](https://github.com/Strako/Generate-testcases-and-docs/issues)
+
+**License**: ISC License
