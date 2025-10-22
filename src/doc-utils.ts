@@ -15,7 +15,6 @@ import * as fs from "fs";
 import * as path from "path";
 import PizZip from "pizzip";
 import { data } from "./data/data";
-import { titles } from "./data/titles";
 
 // ===============================
 // Data types
@@ -26,10 +25,6 @@ interface TestCase {
   test_case: string;
   test_type: string;
   isFirst: boolean;
-}
-
-interface Title {
-  text: string;
 }
 
 // ===============================
@@ -92,9 +87,9 @@ function createTestCaseTable(testId: number, tc: TestCase): Table {
 // ===============================
 // Generate new test cases document
 // ===============================
-async function generateNewTestCasesDoc(): Promise<Buffer> {
+async function generateNewTestCasesDoc(titles: string[]): Promise<Buffer> {
   const testCasesData: TestCase[] = data;
-  const titlesData: Title[] = titles;
+  const titlesData: string[] = titles;
   let TEST_ID = 1228;
   let TITLE_IDX = 0;
 
@@ -105,7 +100,7 @@ async function generateNewTestCasesDoc(): Promise<Buffer> {
       newParagraphs.push(
         new Paragraph({ children: [new TextRun({ break: 1 })] }),
         new Paragraph({
-          text: titlesData[TITLE_IDX].text,
+          text: titlesData[TITLE_IDX],
           heading: HeadingLevel.HEADING_1,
         }),
       );
@@ -213,14 +208,14 @@ async function mergeDocxFiles(
 // ===============================
 // Create final_document.docx
 // ===============================
-export default async function generateDocWithAppend() {
+export default async function generateDocWithAppend(titles: string[]) {
   const originalDocPath = "./original.docx";
   const outputPath = "./final_document.docx";
 
   try {
     // Step 1: Generate new test cases document
     console.log("📝 Generating new test cases...");
-    const newContentBuffer = await generateNewTestCasesDoc();
+    const newContentBuffer = await generateNewTestCasesDoc(titles);
 
     // Step 2: Check if original document exists
     if (!fs.existsSync(originalDocPath)) {

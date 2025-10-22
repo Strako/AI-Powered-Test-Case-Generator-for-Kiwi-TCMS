@@ -17,11 +17,23 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "watch": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --watch",
-    "build": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx"
+    "watch": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv --watch",
+    "build": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "docxtemplater": "^3.66.7",
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
+    "groq-sdk": "^0.34.0",
+    "minimist": "^1.2.8",
+    "node-fetch": "^3.3.2",
+    "pizzip": "^3.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.27.0",
+    "@types/minimist": "^1.2.5",
     "@typescript-eslint/eslint-plugin": "^8.33.0",
     "@typescript-eslint/parser": "^8.33.0",
     "esbuild": "^0.25.11",
@@ -33,12 +45,5 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.0"
-  },
-  "dependencies": {
-    "docx": "^9.5.1",
-    "docxtemplater": "^3.66.7",
-    "fs": "^0.0.1-security",
-    "node-fetch": "^3.3.2",
-    "pizzip": "^3.2.0"
   }
 }
