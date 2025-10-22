@@ -1,8 +1,17 @@
 import { ClientOptions, Groq } from "groq-sdk";
-import { testCasePrompt } from "../data/prompts";
-import { TOOLS } from "./constants";
-import { ACTION_TYPE, AgentResponseUnion } from "./types";
+import { testCasePrompt } from "../../data/prompts";
+import {
+  ATTEMPT_MESSAGE,
+  FAILED_MESSAGE,
+  FETCHING_ERROR_MESSAGE,
+  FINISHED_MESSAGE,
+  RETRY_FAILED,
+  RETYING_MESSAGE,
+  TOOLS,
+} from "../constants";
+import { AgentResponseUnion } from "../types";
 import dotenv from "dotenv";
+import { sleep } from "./utils";
 dotenv.config();
 
 const prompt = testCasePrompt.prompt;
@@ -11,6 +20,9 @@ const options: ClientOptions = {
   apiKey: process.env.GROQ_API_KEY,
 };
 
+// ===============================
+// Set up GROQ SDK and Tools
+// ===============================
 const groq = new Groq(options);
 
 export async function sendPrompt(message: string) {
@@ -33,6 +45,9 @@ export async function sendPrompt(message: string) {
   return chatCompletion.choices;
 }
 
+// ===============================
+// Retrive message completition
+// ===============================
 export async function fetchAI(message: string) {
   console.log(!!message);
 
@@ -50,7 +65,7 @@ export async function fetchAI(message: string) {
         action: tool,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         input,
-        finalAnswer: !tool ? "Finished successfully" : undefined,
+        finalAnswer: !tool ? FINISHED_MESSAGE : undefined,
       };
       console.log(finalResponse);
 
@@ -66,7 +81,7 @@ export async function fetchAI(message: string) {
     console.error(error);
 
     const httpError = new Error(
-      `Error while fetching GROQ: ${String(error)}`,
+      `${FETCHING_ERROR_MESSAGE} ${String(error)}`,
     ) as Error & { statusCode: number };
     httpError.statusCode = 404;
 
@@ -74,15 +89,28 @@ export async function fetchAI(message: string) {
   }
 }
 
-export async function executeTool(agentResponse: AgentResponseUnion) {
-  const action = agentResponse.action;
-
-  if (action === ACTION_TYPE.SAVE_TEST_CASES) {
-    console.log(agentResponse);
-
-    const input = agentResponse.input;
-    const result = "result here";
-
-    return result;
+// ===============================
+// Retry completition fetching
+// ===============================
+export async function fetchWithRetry(
+  message: string,
+  retries = 3,
+  delay = 2000,
+) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`${ATTEMPT_MESSAGE} ${attempt}...`);
+      const response = await fetchAI(message);
+      return response;
+    } catch (error) {
+      console.warn(`${ATTEMPT_MESSAGE} ${attempt} ${FAILED_MESSAGE} ${error}`);
+      if (attempt < retries) {
+        console.log(`${RETYING_MESSAGE} ${delay}ms...`);
+        await sleep(delay);
+      } else {
+        console.error(RETRY_FAILED);
+        throw error;
+      }
+    }
   }
 }

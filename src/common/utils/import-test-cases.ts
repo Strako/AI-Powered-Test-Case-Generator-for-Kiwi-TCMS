@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import fetch from "node-fetch";
-import { testcases } from "./data/testcases";
+import { testcases } from "../../data/testcases";
 
 const csrfmiddlewaretoken =
   "nZe50CazrEeFyfGgVNQVhn0imLctKK7IuoQ2Utp7Mcp3RaQouZWB0w3xk7O8SkyC";

@@ -14,7 +14,7 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import PizZip from "pizzip";
-import { data } from "./data/data";
+import { data } from "../../data/data";
 
 // ===============================
 // Data types

@@ -2,6 +2,22 @@ import { ChatCompletionTool } from "groq-sdk/resources/chat/completions";
 
 export const REQUIREMENTS_PATH = "./requirements.xlsx";
 
+export const ATTEMPT_MESSAGE = "Attempt";
+
+export const FAILED_MESSAGE = "failed: ";
+
+export const RETYING_MESSAGE = "Retrying after";
+
+export const RETRY_FAILED = "All retries failed.";
+
+export const FINISHED_MESSAGE = "Finished successfully";
+
+export const FETCHING_ERROR_MESSAGE = "Error while fetching GROQ:";
+
+export const NUMBER_OF_RETRIES = 3;
+
+export const DELAY_FETCH_TIME = 1000;
+
 export const TOOLS: ChatCompletionTool[] = [
   {
     type: "function",

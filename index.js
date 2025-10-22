@@ -248,6 +248,14 @@ var require_minimist = __commonJS({
 
 // src/common/constants.ts
 var REQUIREMENTS_PATH = "./requirements.xlsx";
+var ATTEMPT_MESSAGE = "Attempt";
+var FAILED_MESSAGE = "failed: ";
+var RETYING_MESSAGE = "Retrying after";
+var RETRY_FAILED = "All retries failed.";
+var FINISHED_MESSAGE = "Finished successfully";
+var FETCHING_ERROR_MESSAGE = "Error while fetching GROQ:";
+var NUMBER_OF_RETRIES = 3;
+var DELAY_FETCH_TIME = 1e3;
 var TOOLS = [
   {
     type: "function",
@@ -298,7 +306,7 @@ var TOOLS = [
 // src/index.ts
 var import_minimist = __toESM(require_minimist(), 1);
 
-// src/read-requirements.ts
+// src/common/utils/read-requirements.ts
 import { createRequire } from "module";
 var require2 = createRequire(import.meta.url);
 var XLSX = require2("xlsx");
@@ -329,24 +337,21 @@ function parseRequirements(filePath) {
   return { moduleTitles, requirements };
 }
 
-// src/common/groq-utls.ts
+// src/common/utils/groq-utls.ts
 import { Groq } from "groq-sdk";
 
 // src/data/prompts.ts
 var testCasePrompt = {
   prompt: `# QA Engineer Profile
-
-## **What should ChatGPT call you?**
-QA Engineer
-
-## **What do you do?**
+## **Cual es tu rol?**
 Quality Assurance Engineer
-
-## **What traits should ChatGPT have?**
 
 ### Prompt para Generar Casos de Prueba en Formato Gherkin
 
 Genera casos de prueba en formato Gherkin basados en las historias de usuario o requerimientos proporcionados. Los casos deben seguir estas especificaciones:
+
+#### **Importante:** 
+- **Todas las respuestas, t\xEDtulos, descripciones y contenido de los casos de prueba deben estar en espa\xF1ol.**
 
 #### **Formato del T\xEDtulo**
 Cada t\xEDtulo debe comenzar con el prefijo: [prefijo: issue_id]
@@ -409,16 +414,41 @@ Casos de prueba completos y ejecutables enfocados en:
 - Casos borde (Edge Cases): Validaciones de l\xEDmites, valores extremos, y escenarios l\xEDmite
 - Cobertura equilibrada entre escenarios positivos y casos l\xEDmite
 - Formato consistente para facilitar revisi\xF3n y mantenimiento
+- Todos los textos deben ser **exclusivamente en espa\xF1ol**.
+
 
 ### **Requisitos de Cobertura:**
-- Al finalizar, obligatoriamente usa la herramienta "saveTestCases" para guardar los cassos de prueba generados, alimentando los parametros "testCaseDoc" con el "JSON 2 - Para Python" y "testCaseTCMS" con "JSON 1 - Para TCMS"
+- Al finalizar la generaci\xF3n de todos los casos de prueba, **usa obligatoriamente la herramienta "saveTestCases"**.
+  - Pasa los par\xE1metros:
+    - "testCaseDoc" = "JSON 2 - Para Python"
+    - "testCaseTCMS" = "JSON 1 - Para TCMS"
+- Aseg\xFArate de llamar a esta herramienta **como \xFAltimo paso en la respuesta**.
 - Genera todos los casos de prueba necesarios para cubrir completamente la funcionalidad, incluyendo escenarios felices, casos borde, validaciones y errores. No te limites a un n\xFAmero fijo; busca m\xE1xima cobertura con pruebas positivas y negativas.
 - Genera los casos de prueba necesarios para probar todos los flujos descritos, por lo general estos nunca deben ser menos de 10
 `
 };
 
-// src/common/groq-utls.ts
+// src/common/utils/groq-utls.ts
 import dotenv from "dotenv";
+
+// src/common/utils/utils.ts
+var logResponse = (response) => {
+  if (response) {
+    console.log(response);
+    const action = response.action;
+    const testCasesDoc = response.input.testCaseDoc;
+    const testCasesTCMS = response.input.testCaseTCMS;
+    console.dir(
+      { action, testCasesDoc, testCasesTCMS },
+      { depth: null, colors: true }
+    );
+  }
+};
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// src/common/utils/groq-utls.ts
 dotenv.config();
 var prompt = testCasePrompt.prompt;
 var options = {
@@ -457,7 +487,7 @@ async function fetchAI(message) {
         action: tool,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         input,
-        finalAnswer: !tool ? "Finished successfully" : void 0
+        finalAnswer: !tool ? FINISHED_MESSAGE : void 0
       };
       console.log(finalResponse);
       return finalResponse;
@@ -468,10 +498,28 @@ async function fetchAI(message) {
   } catch (error) {
     console.error(error);
     const httpError = new Error(
-      `Error while fetching GROQ: ${String(error)}`
+      `${FETCHING_ERROR_MESSAGE} ${String(error)}`
     );
     httpError.statusCode = 404;
     throw httpError;
+  }
+}
+async function fetchWithRetry(message, retries = 3, delay = 2e3) {
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      console.log(`${ATTEMPT_MESSAGE} ${attempt}...`);
+      const response = await fetchAI(message);
+      return response;
+    } catch (error) {
+      console.warn(`${ATTEMPT_MESSAGE} ${attempt} ${FAILED_MESSAGE} ${error}`);
+      if (attempt < retries) {
+        console.log(`${RETYING_MESSAGE} ${delay}ms...`);
+        await sleep(delay);
+      } else {
+        console.error(RETRY_FAILED);
+        throw error;
+      }
+    }
   }
 }
 
@@ -482,14 +530,18 @@ var argv = (0, import_minimist.default)(args);
 console.log(argv.product, argv.category);
 async function main() {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
-  const testCase = JSON.stringify(requirements[0]);
-  const groqResponse = await fetchAI(testCase);
-  const action = groqResponse.action;
-  const testCasesDoc = groqResponse.input.testCaseDoc;
-  const testCasesTCMS = groqResponse.input.testCaseTCMS;
-  console.dir(
-    { action, testCasesDoc, testCasesTCMS },
-    { depth: null, colors: true }
-  );
+  for (const requirement of requirements) {
+    const parsedRequirement = JSON.stringify(requirement);
+    try {
+      const response = await fetchWithRetry(
+        parsedRequirement,
+        NUMBER_OF_RETRIES,
+        DELAY_FETCH_TIME
+      );
+      logResponse(response);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 }
 await main();
