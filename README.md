@@ -30,7 +30,7 @@ This tool is specifically designed for QA Engineers working in agile environment
 - **📊 Excel Integration**: Reads requirements directly from Excel files with structured parsing
 - **🥒 Gherkin Format**: Generates BDD-style test cases with Given/When/Then structure
 - **📝 Dual Output**: Creates both TCMS-ready and documentation-ready formats
-- **📄 Professional Documentation**: Generates formatted Word documents with tables and styling
+- **📄 Documentation**: Generates formatted Word documents with tables and styling
 - **🔄 Document Merging**: Combines new test cases with existing documentation
 - **🛠️ TCMS Integration**: Direct upload capability to Test Case Management Systems
 - **🎯 Comprehensive Coverage**: Ensures Happy Path, Edge Cases, and Negative scenarios
@@ -47,7 +47,7 @@ This tool is specifically designed for QA Engineers working in agile environment
                                 ▼
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 │   TCMS Upload   │◀───│   Dual Output   │───▶│  Word Document  │
-│   (HTTP API)    │    │   Generator     │    │  (Professional) │
+│   (HTTP API)    │    │   Generator     │    │ (Documentation) │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
