@@ -4,12 +4,13 @@ import {
   REQUIREMENTS_PATH,
 } from "./common/constants";
 import generateDocWithAppend from "./common/utils/doc-utils";
-/* import importTestCases from "./import-test-cases";
- */
+import importTestCases from "./common/utils/import-test-cases";
+
 import minimist from "minimist";
 import { parseRequirements } from "./common/utils/read-requirements";
 import { fetchWithRetry } from "./common/utils/groq-utls";
-import { logResponse } from "./common/utils/utils";
+import { TestCaseDoc, TestCaseTCMS } from "./common/types";
+import { writeFiles } from "./common/utils/utils";
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 
@@ -20,6 +21,8 @@ console.log(argv.product, argv.category);
 
 async function main() {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
+  let arrayTCMS: TestCaseTCMS[] = [];
+  let arrayDocs: TestCaseDoc[] = [];
 
   for (const requirement of requirements) {
     const parsedRequirement = JSON.stringify(requirement);
@@ -29,16 +32,22 @@ async function main() {
         NUMBER_OF_RETRIES,
         DELAY_FETCH_TIME,
       );
-      logResponse(response);
+      if (response) {
+        const responseTCMS = response?.input.testCaseTCMS;
+        const responseDocs = response?.input.testCaseDoc;
+
+        arrayTCMS = arrayTCMS.concat(responseTCMS);
+        arrayDocs = arrayDocs.concat(responseDocs);
+      }
     } catch (err) {
       console.error(err);
     }
   }
+  await writeFiles(arrayTCMS, arrayDocs);
 
-  /*   await importTestCases();
-   */
-  /*   await generateDocWithAppend(moduleTitles);
-   */
+  await importTestCases(arrayTCMS);
+
+  await generateDocWithAppend(moduleTitles, arrayDocs);
 }
 
 await main();

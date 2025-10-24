@@ -1,4 +1,11 @@
-import { ACTION_TYPE, AgentResponseUnion } from "../types";
+import {
+  ACTION_TYPE,
+  AgentResponseUnion,
+  TestCaseDoc,
+  TestCaseTCMS,
+} from "../types";
+import path from "node:path";
+import { promises as fs } from "node:fs";
 
 // ===============================
 // Log object, action an params
@@ -28,15 +35,25 @@ export function sleep(ms: number) {
 // ===============================
 // Execute related action function
 // ===============================
-export async function executeTool(response: AgentResponseUnion) {
-  const action = response.action;
+export async function writeFiles(
+  arrayTCMS: TestCaseTCMS[],
+  arrayDocs: TestCaseDoc[],
+): Promise<void> {
+  const testcasesPath = path.join(process.cwd(), "testcases.json");
+  const dataPath = path.join(process.cwd(), "data.json");
 
-  if (action === ACTION_TYPE.SAVE_TEST_CASES) {
-    console.log(response);
+  const formattedTCMS = JSON.stringify(arrayTCMS, null, 2);
+  const formattedDocs = JSON.stringify(arrayDocs, null, 2);
 
-    const input = response.input;
-    const result = "result here";
+  try {
+    await fs.writeFile(testcasesPath, formattedTCMS, "utf-8");
+    await fs.writeFile(dataPath, formattedDocs, "utf-8");
 
-    return result;
+    console.log("✅ JSON files generated successfully:");
+    console.log(`- ${testcasesPath}`);
+    console.log(`- ${dataPath}`);
+  } catch (error) {
+    console.error("❌ Error writing JSON files:", error);
+    throw error;
   }
 }

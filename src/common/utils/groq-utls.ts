@@ -12,6 +12,7 @@ import {
 import { AgentResponseUnion } from "../types";
 import dotenv from "dotenv";
 import { sleep } from "./utils";
+import { exit } from "node:process";
 dotenv.config();
 
 const prompt = testCasePrompt.prompt;
@@ -31,7 +32,8 @@ export async function sendPrompt(message: string) {
       { role: "system", content: prompt },
       { role: "user", content: message },
     ],
-    model: "openai/gpt-oss-20b",
+    /*     model: "openai/gpt-oss-20b",*/
+    model: "openai/gpt-oss-120b",
     temperature: 1,
     max_completion_tokens: 8192,
     top_p: 1,
@@ -56,20 +58,26 @@ export async function fetchAI(message: string) {
 
     const data = choices.map((choice) => {
       const tool = choice?.message?.tool_calls?.[0].function.name;
+
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const input = JSON.parse(
         choice?.message?.tool_calls?.[0].function?.arguments ?? "{}",
       );
-      const finalResponse = {
-        thought: choice.message.reasoning,
-        action: tool,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        input,
-        finalAnswer: !tool ? FINISHED_MESSAGE : undefined,
-      };
-      console.log(finalResponse);
 
-      return finalResponse;
+      if (tool && Object.entries(input).length) {
+        const finalResponse = {
+          thought: choice.message.reasoning,
+          action: tool,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          input,
+          finalAnswer: !tool ? FINISHED_MESSAGE : undefined,
+        };
+        console.log(finalResponse);
+
+        return finalResponse;
+      } else {
+        throw new Error("Tool or input missing");
+      }
     });
 
     const result = data[0];
@@ -109,7 +117,7 @@ export async function fetchWithRetry(
         await sleep(delay);
       } else {
         console.error(RETRY_FAILED);
-        throw error;
+        exit(1);
       }
     }
   }

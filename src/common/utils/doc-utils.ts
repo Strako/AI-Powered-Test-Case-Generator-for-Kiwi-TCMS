@@ -11,10 +11,9 @@ import {
   WidthType,
   ShadingType,
 } from "docx";
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
 import PizZip from "pizzip";
-import { data } from "../../data/data";
+import { TestCaseDoc } from "../types";
 
 // ===============================
 // Data types
@@ -87,7 +86,10 @@ function createTestCaseTable(testId: number, tc: TestCase): Table {
 // ===============================
 // Generate new test cases document
 // ===============================
-async function generateNewTestCasesDoc(titles: string[]): Promise<Buffer> {
+async function generateNewTestCasesDoc(
+  titles: string[],
+  data: TestCaseDoc[],
+): Promise<Buffer> {
   const testCasesData: TestCase[] = data;
   const titlesData: string[] = titles;
   let TEST_ID = 1228;
@@ -137,14 +139,11 @@ async function mergeDocxFiles(
   outputPath: string,
 ): Promise<void> {
   try {
-    // Read original document
     const originalContent = fs.readFileSync(originalPath);
     const originalZip = new PizZip(originalContent);
 
-    // Read new content document
     const newZip = new PizZip(newContentBuffer);
 
-    // Extract document.xml from both files
     const originalDocXml = originalZip.file("word/document.xml")?.asText();
     const newDocXml = newZip.file("word/document.xml")?.asText();
 
@@ -152,7 +151,6 @@ async function mergeDocxFiles(
       throw new Error("Could not extract document.xml from one of the files");
     }
 
-    // Find the closing body tag in original document
     const bodyEndTag = "</w:body>";
     const bodyEndIndex = originalDocXml.lastIndexOf(bodyEndTag);
 
@@ -160,26 +158,21 @@ async function mergeDocxFiles(
       throw new Error("Could not find closing body tag in original document");
     }
 
-    // Extract content from new document (everything between <w:body> and </w:body>)
     const newBodyStart = newDocXml.indexOf("<w:body>") + "<w:body>".length;
     const newBodyEnd = newDocXml.lastIndexOf("</w:body>");
     const newContent = newDocXml.substring(newBodyStart, newBodyEnd);
 
-    // Add page break before new content
     // eslint-disable-next-line quotes
     const pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
 
-    // Merge: original content + page break + new content + closing tags
     const mergedDocXml =
       originalDocXml.substring(0, bodyEndIndex) +
       pageBreak +
       newContent +
       originalDocXml.substring(bodyEndIndex);
 
-    // Update the document.xml in the original zip
     originalZip.file("word/document.xml", mergedDocXml);
 
-    // Copy media files from new document if they exist
     const newMediaFiles = Object.keys(newZip.files).filter((filename) =>
       filename.startsWith("word/media/"),
     );
@@ -191,13 +184,11 @@ async function mergeDocxFiles(
       }
     }
 
-    // Generate the final merged document
     const mergedBuffer = originalZip.generate({
       type: "nodebuffer",
       compression: "DEFLATE",
     });
 
-    // Write to output file
     fs.writeFileSync(outputPath, mergedBuffer);
     console.log(`✅ Documents merged successfully: ${outputPath}`);
   } catch (error) {
@@ -208,24 +199,23 @@ async function mergeDocxFiles(
 // ===============================
 // Create final_document.docx
 // ===============================
-export default async function generateDocWithAppend(titles: string[]) {
+export default async function generateDocWithAppend(
+  titles: string[],
+  data: TestCaseDoc[],
+) {
   const originalDocPath = "./original.docx";
   const outputPath = "./final_document.docx";
 
   try {
-    // Step 1: Generate new test cases document
     console.log("📝 Generating new test cases...");
-    const newContentBuffer = await generateNewTestCasesDoc(titles);
+    const newContentBuffer = await generateNewTestCasesDoc(titles, data);
 
-    // Step 2: Check if original document exists
     if (!fs.existsSync(originalDocPath)) {
-      // If no original exists, just save the new content
       fs.writeFileSync(outputPath, newContentBuffer);
       console.log("✅ New document created (no original to merge)");
       return;
     }
 
-    // Step 3: Merge with original document
     console.log("🔗 Merging with original document...");
     await mergeDocxFiles(originalDocPath, newContentBuffer, outputPath);
   } catch (error) {

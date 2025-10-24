@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import fetch from "node-fetch";
-import { testcases } from "../../data/testcases";
+import { TestCaseTCMS } from "../types";
 
 const csrfmiddlewaretoken =
   "nZe50CazrEeFyfGgVNQVhn0imLctKK7IuoQ2Utp7Mcp3RaQouZWB0w3xk7O8SkyC";
@@ -51,8 +51,8 @@ const createTest = async (title: string, content: string) => {
 // ===============================
 // Upload each test case
 // ===============================
-export default async function importTestCases() {
-  for (const test of testcases) {
+export default async function importTestCases(arrayTCMS: TestCaseTCMS[]) {
+  for (const test of arrayTCMS) {
     await createTest(test.title, test.content);
   }
 }

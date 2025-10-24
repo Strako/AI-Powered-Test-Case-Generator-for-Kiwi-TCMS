@@ -303,6 +303,214 @@ var TOOLS = [
   }
 ];
 
+// src/common/utils/doc-utils.ts
+import {
+  AlignmentType,
+  Document,
+  HeadingLevel,
+  Packer,
+  Paragraph,
+  Table,
+  TableCell,
+  TableRow,
+  TextRun,
+  WidthType,
+  ShadingType
+} from "docx";
+import * as fs from "node:fs";
+import PizZip from "pizzip";
+function createTestCaseTable(testId, tc) {
+  const headerCell = new TableCell({
+    children: [
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: `ID \u2013 ${testId}`,
+            bold: true,
+            color: "FFFFFF"
+          })
+        ],
+        alignment: AlignmentType.CENTER
+      })
+    ],
+    shading: {
+      fill: "0E4CB2",
+      type: ShadingType.CLEAR,
+      color: "auto"
+    },
+    columnSpan: 2
+  });
+  return new Table({
+    width: { size: 100, type: WidthType.PERCENTAGE },
+    rows: [
+      new TableRow({ children: [headerCell] }),
+      new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph("T\xEDtulo")] }),
+          new TableCell({ children: [new Paragraph(tc.title)] })
+        ]
+      }),
+      new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph("Descripci\xF3n")] }),
+          new TableCell({ children: [new Paragraph(tc.description)] })
+        ]
+      }),
+      new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph("Caso de prueba")] }),
+          new TableCell({ children: [new Paragraph(tc.test_case)] })
+        ]
+      }),
+      new TableRow({
+        children: [
+          new TableCell({ children: [new Paragraph("Tipo de test")] }),
+          new TableCell({ children: [new Paragraph(tc.test_type)] })
+        ]
+      })
+    ]
+  });
+}
+async function generateNewTestCasesDoc(titles, data) {
+  const testCasesData = data;
+  const titlesData = titles;
+  let TEST_ID = 1228;
+  let TITLE_IDX = 0;
+  const newParagraphs = [];
+  for (const tc of testCasesData) {
+    if (tc.isFirst) {
+      newParagraphs.push(
+        new Paragraph({ children: [new TextRun({ break: 1 })] }),
+        new Paragraph({
+          text: titlesData[TITLE_IDX],
+          heading: HeadingLevel.HEADING_1
+        })
+      );
+      TITLE_IDX++;
+    }
+    const table = createTestCaseTable(TEST_ID, tc);
+    newParagraphs.push(
+      new Paragraph({ text: "" }),
+      table,
+      new Paragraph({ text: "" })
+    );
+    TEST_ID++;
+  }
+  const doc = new Document({
+    sections: [
+      {
+        children: newParagraphs
+      }
+    ]
+  });
+  return await Packer.toBuffer(doc);
+}
+async function mergeDocxFiles(originalPath, newContentBuffer, outputPath) {
+  try {
+    const originalContent = fs.readFileSync(originalPath);
+    const originalZip = new PizZip(originalContent);
+    const newZip = new PizZip(newContentBuffer);
+    const originalDocXml = originalZip.file("word/document.xml")?.asText();
+    const newDocXml = newZip.file("word/document.xml")?.asText();
+    if (!originalDocXml || !newDocXml) {
+      throw new Error("Could not extract document.xml from one of the files");
+    }
+    const bodyEndTag = "</w:body>";
+    const bodyEndIndex = originalDocXml.lastIndexOf(bodyEndTag);
+    if (bodyEndIndex === -1) {
+      throw new Error("Could not find closing body tag in original document");
+    }
+    const newBodyStart = newDocXml.indexOf("<w:body>") + "<w:body>".length;
+    const newBodyEnd = newDocXml.lastIndexOf("</w:body>");
+    const newContent = newDocXml.substring(newBodyStart, newBodyEnd);
+    const pageBreak = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+    const mergedDocXml = originalDocXml.substring(0, bodyEndIndex) + pageBreak + newContent + originalDocXml.substring(bodyEndIndex);
+    originalZip.file("word/document.xml", mergedDocXml);
+    const newMediaFiles = Object.keys(newZip.files).filter(
+      (filename) => filename.startsWith("word/media/")
+    );
+    for (const mediaFile of newMediaFiles) {
+      const file = newZip.file(mediaFile);
+      if (file) {
+        originalZip.file(mediaFile, file.asNodeBuffer());
+      }
+    }
+    const mergedBuffer = originalZip.generate({
+      type: "nodebuffer",
+      compression: "DEFLATE"
+    });
+    fs.writeFileSync(outputPath, mergedBuffer);
+    console.log(`\u2705 Documents merged successfully: ${outputPath}`);
+  } catch (error) {
+    throw new Error(`\u274C Error merging documents: ${error}`);
+  }
+}
+async function generateDocWithAppend(titles, data) {
+  const originalDocPath = "./original.docx";
+  const outputPath = "./final_document.docx";
+  try {
+    console.log("\u{1F4DD} Generating new test cases...");
+    const newContentBuffer = await generateNewTestCasesDoc(titles, data);
+    if (!fs.existsSync(originalDocPath)) {
+      fs.writeFileSync(outputPath, newContentBuffer);
+      console.log("\u2705 New document created (no original to merge)");
+      return;
+    }
+    console.log("\u{1F517} Merging with original document...");
+    await mergeDocxFiles(originalDocPath, newContentBuffer, outputPath);
+  } catch (error) {
+    console.error("\u274C Error:", error);
+    throw error;
+  }
+}
+
+// src/common/utils/import-test-cases.ts
+import fetch from "node-fetch";
+var csrfmiddlewaretoken = "nZe50CazrEeFyfGgVNQVhn0imLctKK7IuoQ2Utp7Mcp3RaQouZWB0w3xk7O8SkyC";
+var csrftoken = "hzM741pIvIlyt5kiJmgQTjdp8wMPiKB4";
+var default_tester = "armando";
+var product_id = "1";
+var category_id = "1";
+var headers = (title, content) => ({
+  headers: {
+    accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    "accept-language": "en",
+    "cache-control": "no-cache",
+    "content-type": "application/x-www-form-urlencoded",
+    pragma: "no-cache",
+    "sec-fetch-dest": "document",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "same-origin",
+    "sec-fetch-user": "?1",
+    "upgrade-insecure-requests": "1",
+    cookie: `NEXT_LOCALE=es; _fbp=fb.0.1757619907010.549046907627441429; _ga=GA1.1.1097585688.1757619907; __stripe_mid=e6e228bc-bbd1-4fec-8e40-ac6089c2fd6f1ef505; _ga_WE7JYK3W5B=GS2.1.s1757619907$o1$g1$t1757622540$j60$l0$h0; csrftoken=${csrftoken}; sessionid=2aoll3oczzvbbpq6r9jokq59kcpp55iq; _dd_s=logs=1&id=6ad4b8c6-cb10-4c59-bcd0-666d90616351&created=1760546518282&expire=1760549321739`,
+    Referer: "https://localhost/cases/new/"
+  },
+  body: `csrfmiddlewaretoken=${csrfmiddlewaretoken}&author=2&summary=${title}&default_tester=${default_tester}&product=${product_id}&category=${category_id}&case_status=2&priority=1&setup_duration=0&testing_duration=0&text=${content}&script=&arguments=&requirement=&extra_link=&notes=&email_settings-0-auto_to_case_author=on&email_settings-0-auto_to_run_manager=on&email_settings-0-auto_to_execution_assignee=on&email_settings-0-auto_to_case_tester=on&email_settings-0-auto_to_run_tester=on&email_settings-0-notify_on_case_update=on&email_settings-0-notify_on_case_delete=on&email_settings-0-cc_list=&email_settings-0-case=&email_settings-0-id=&email_settings-TOTAL_FORMS=1&email_settings-INITIAL_FORMS=0&email_settings-MIN_NUM_FORMS=0&email_settings-MAX_NUM_FORMS=1`,
+  method: "POST"
+});
+var createTest = async (title, content) => {
+  let response;
+  try {
+    response = await fetch(
+      "https://localhost/cases/new/",
+      headers(title, content)
+    );
+    if (response.ok) {
+      const status = await response.status;
+      console.log(status);
+    }
+  } catch (error) {
+    throw new Error(`Error at creating test case: ${title}
+Error: ${error}`);
+  }
+};
+async function importTestCases(arrayTCMS) {
+  for (const test of arrayTCMS) {
+    await createTest(test.title, test.content);
+  }
+}
+
 // src/index.ts
 var import_minimist = __toESM(require_minimist(), 1);
 
@@ -432,23 +640,30 @@ Casos de prueba completos y ejecutables enfocados en:
 import dotenv from "dotenv";
 
 // src/common/utils/utils.ts
-var logResponse = (response) => {
-  if (response) {
-    console.log(response);
-    const action = response.action;
-    const testCasesDoc = response.input.testCaseDoc;
-    const testCasesTCMS = response.input.testCaseTCMS;
-    console.dir(
-      { action, testCasesDoc, testCasesTCMS },
-      { depth: null, colors: true }
-    );
-  }
-};
+import path from "node:path";
+import { promises as fs2 } from "node:fs";
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+async function writeFiles(arrayTCMS, arrayDocs) {
+  const testcasesPath = path.join(process.cwd(), "testcases.json");
+  const dataPath = path.join(process.cwd(), "data.json");
+  const formattedTCMS = JSON.stringify(arrayTCMS, null, 2);
+  const formattedDocs = JSON.stringify(arrayDocs, null, 2);
+  try {
+    await fs2.writeFile(testcasesPath, formattedTCMS, "utf-8");
+    await fs2.writeFile(dataPath, formattedDocs, "utf-8");
+    console.log("\u2705 JSON files generated successfully:");
+    console.log(`- ${testcasesPath}`);
+    console.log(`- ${dataPath}`);
+  } catch (error) {
+    console.error("\u274C Error writing JSON files:", error);
+    throw error;
+  }
+}
 
 // src/common/utils/groq-utls.ts
+import { exit } from "node:process";
 dotenv.config();
 var prompt = testCasePrompt.prompt;
 var options = {
@@ -461,7 +676,8 @@ async function sendPrompt(message) {
       { role: "system", content: prompt },
       { role: "user", content: message }
     ],
-    model: "openai/gpt-oss-20b",
+    /*     model: "openai/gpt-oss-20b",*/
+    model: "openai/gpt-oss-120b",
     temperature: 1,
     max_completion_tokens: 8192,
     top_p: 1,
@@ -482,15 +698,19 @@ async function fetchAI(message) {
       const input = JSON.parse(
         choice?.message?.tool_calls?.[0].function?.arguments ?? "{}"
       );
-      const finalResponse = {
-        thought: choice.message.reasoning,
-        action: tool,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        input,
-        finalAnswer: !tool ? FINISHED_MESSAGE : void 0
-      };
-      console.log(finalResponse);
-      return finalResponse;
+      if (tool && Object.entries(input).length) {
+        const finalResponse = {
+          thought: choice.message.reasoning,
+          action: tool,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          input,
+          finalAnswer: !tool ? FINISHED_MESSAGE : void 0
+        };
+        console.log(finalResponse);
+        return finalResponse;
+      } else {
+        throw new Error("Tool or input missing");
+      }
     });
     const result = data[0];
     const parsedResult = result;
@@ -517,7 +737,7 @@ async function fetchWithRetry(message, retries = 3, delay = 2e3) {
         await sleep(delay);
       } else {
         console.error(RETRY_FAILED);
-        throw error;
+        exit(1);
       }
     }
   }
@@ -530,6 +750,8 @@ var argv = (0, import_minimist.default)(args);
 console.log(argv.product, argv.category);
 async function main() {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
+  let arrayTCMS = [];
+  let arrayDocs = [];
   for (const requirement of requirements) {
     const parsedRequirement = JSON.stringify(requirement);
     try {
@@ -538,10 +760,18 @@ async function main() {
         NUMBER_OF_RETRIES,
         DELAY_FETCH_TIME
       );
-      logResponse(response);
+      if (response) {
+        const responseTCMS = response?.input.testCaseTCMS;
+        const responseDocs = response?.input.testCaseDoc;
+        arrayTCMS = arrayTCMS.concat(responseTCMS);
+        arrayDocs = arrayDocs.concat(responseDocs);
+      }
     } catch (err) {
       console.error(err);
     }
   }
+  await writeFiles(arrayTCMS, arrayDocs);
+  await importTestCases(arrayTCMS);
+  await generateDocWithAppend(moduleTitles, arrayDocs);
 }
 await main();
