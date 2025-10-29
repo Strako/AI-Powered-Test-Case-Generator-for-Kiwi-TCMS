@@ -302,6 +302,17 @@ var TOOLS = [
     }
   }
 ];
+var MESSAGE_PROP_PRESENT = "\u2705 Message recived";
+var MISSING_MESSAGE_PROP = "\u274C No message is present";
+var TCMS_CREATE_ERROR = "\u274C Error at creating test case:";
+var ERROR_EXTRACT_XML = "Could not extract document.xml from one of the files";
+var MISSING_CLOSING_TAG = "Could not find closing body tag in original document";
+var SUCCESS_MERGE = "\u2705 Documents merged successfully:";
+var FAILED_MERGE = "\u274C Error merging documents:";
+var MISSING_ORIGINAL_DOC = "\u2705 New document created (no original to merge)";
+var GENERIC_ERROR = "\u274C Error:";
+var SUCCESSFULLY_GENERATED_JSON = "\u2705 JSON files generated successfully:";
+var ERROR_GENERATING_JSON = "\u274C Error writing JSON files:";
 
 // src/common/utils/doc-utils.ts
 import {
@@ -413,12 +424,12 @@ async function mergeDocxFiles(originalPath, newContentBuffer, outputPath) {
     const originalDocXml = originalZip.file("word/document.xml")?.asText();
     const newDocXml = newZip.file("word/document.xml")?.asText();
     if (!originalDocXml || !newDocXml) {
-      throw new Error("Could not extract document.xml from one of the files");
+      throw new Error(ERROR_EXTRACT_XML);
     }
     const bodyEndTag = "</w:body>";
     const bodyEndIndex = originalDocXml.lastIndexOf(bodyEndTag);
     if (bodyEndIndex === -1) {
-      throw new Error("Could not find closing body tag in original document");
+      throw new Error(MISSING_CLOSING_TAG);
     }
     const newBodyStart = newDocXml.indexOf("<w:body>") + "<w:body>".length;
     const newBodyEnd = newDocXml.lastIndexOf("</w:body>");
@@ -440,9 +451,10 @@ async function mergeDocxFiles(originalPath, newContentBuffer, outputPath) {
       compression: "DEFLATE"
     });
     fs.writeFileSync(outputPath, mergedBuffer);
-    console.log(`\u2705 Documents merged successfully: ${outputPath}`);
+    console.log(`${SUCCESS_MERGE} 
+- ${outputPath}`);
   } catch (error) {
-    throw new Error(`\u274C Error merging documents: ${error}`);
+    throw new Error(`${FAILED_MERGE} ${error}`);
   }
 }
 async function generateDocWithAppend(titles, data) {
@@ -453,25 +465,24 @@ async function generateDocWithAppend(titles, data) {
     const newContentBuffer = await generateNewTestCasesDoc(titles, data);
     if (!fs.existsSync(originalDocPath)) {
       fs.writeFileSync(outputPath, newContentBuffer);
-      console.log("\u2705 New document created (no original to merge)");
+      console.log(MISSING_ORIGINAL_DOC);
       return;
     }
     console.log("\u{1F517} Merging with original document...");
     await mergeDocxFiles(originalDocPath, newContentBuffer, outputPath);
   } catch (error) {
-    console.error("\u274C Error:", error);
+    console.error(GENERIC_ERROR, error);
     throw error;
   }
 }
 
 // src/common/utils/import-test-cases.ts
 import fetch from "node-fetch";
-var csrfmiddlewaretoken = "nZe50CazrEeFyfGgVNQVhn0imLctKK7IuoQ2Utp7Mcp3RaQouZWB0w3xk7O8SkyC";
-var csrftoken = "hzM741pIvIlyt5kiJmgQTjdp8wMPiKB4";
+var csrfmiddlewaretoken = "Jg3NMswgazneySVu6H8alegPTWuFExCng58yV4h5KnqRvdkSHzVWnpI0KBLHyaRY";
+var csrftoken = "HZfVjMVZKYdN7vzyL2XWclCl1Prc4NpL";
 var default_tester = "armando";
-var product_id = "1";
-var category_id = "1";
-var headers = (title, content) => ({
+var sessionid = "p1fli3ebbai6abovt7kbyx9ear2y1r2l";
+var headers = (title, content, product_id2, category_id2) => ({
   headers: {
     accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "accept-language": "en",
@@ -483,31 +494,31 @@ var headers = (title, content) => ({
     "sec-fetch-site": "same-origin",
     "sec-fetch-user": "?1",
     "upgrade-insecure-requests": "1",
-    cookie: `NEXT_LOCALE=es; _fbp=fb.0.1757619907010.549046907627441429; _ga=GA1.1.1097585688.1757619907; __stripe_mid=e6e228bc-bbd1-4fec-8e40-ac6089c2fd6f1ef505; _ga_WE7JYK3W5B=GS2.1.s1757619907$o1$g1$t1757622540$j60$l0$h0; csrftoken=${csrftoken}; sessionid=2aoll3oczzvbbpq6r9jokq59kcpp55iq; _dd_s=logs=1&id=6ad4b8c6-cb10-4c59-bcd0-666d90616351&created=1760546518282&expire=1760549321739`,
+    cookie: `NEXT_LOCALE=es; _fbp=fb.0.1757619907010.549046907627441429; _ga=GA1.1.1097585688.1757619907; __stripe_mid=e6e228bc-bbd1-4fec-8e40-ac6089c2fd6f1ef505; _ga_WE7JYK3W5B=GS2.1.s1757619907$o1$g1$t1757622540$j60$l0$h0; csrftoken=${csrftoken}; sessionid=${sessionid}; _dd_s=logs=1&id=6ad4b8c6-cb10-4c59-bcd0-666d90616351&created=1760546518282&expire=1760549321739`,
     Referer: "https://localhost/cases/new/"
   },
-  body: `csrfmiddlewaretoken=${csrfmiddlewaretoken}&author=2&summary=${title}&default_tester=${default_tester}&product=${product_id}&category=${category_id}&case_status=2&priority=1&setup_duration=0&testing_duration=0&text=${content}&script=&arguments=&requirement=&extra_link=&notes=&email_settings-0-auto_to_case_author=on&email_settings-0-auto_to_run_manager=on&email_settings-0-auto_to_execution_assignee=on&email_settings-0-auto_to_case_tester=on&email_settings-0-auto_to_run_tester=on&email_settings-0-notify_on_case_update=on&email_settings-0-notify_on_case_delete=on&email_settings-0-cc_list=&email_settings-0-case=&email_settings-0-id=&email_settings-TOTAL_FORMS=1&email_settings-INITIAL_FORMS=0&email_settings-MIN_NUM_FORMS=0&email_settings-MAX_NUM_FORMS=1`,
+  body: `csrfmiddlewaretoken=${csrfmiddlewaretoken}&author=2&summary=${title}&default_tester=${default_tester}&product=${product_id2}&category=${category_id2}&case_status=2&priority=1&setup_duration=0&testing_duration=0&text=${content}&script=&arguments=&requirement=&extra_link=&notes=&email_settings-0-auto_to_case_author=on&email_settings-0-auto_to_run_manager=on&email_settings-0-auto_to_execution_assignee=on&email_settings-0-auto_to_case_tester=on&email_settings-0-auto_to_run_tester=on&email_settings-0-notify_on_case_update=on&email_settings-0-notify_on_case_delete=on&email_settings-0-cc_list=&email_settings-0-case=&email_settings-0-id=&email_settings-TOTAL_FORMS=1&email_settings-INITIAL_FORMS=0&email_settings-MIN_NUM_FORMS=0&email_settings-MAX_NUM_FORMS=1`,
   method: "POST"
 });
-var createTest = async (title, content) => {
+var createTest = async (title, content, product_id2, category_id2) => {
   let response;
   try {
     response = await fetch(
       "https://localhost/cases/new/",
-      headers(title, content)
+      headers(title, content, product_id2, category_id2)
     );
     if (response.ok) {
       const status = await response.status;
       console.log(status);
     }
   } catch (error) {
-    throw new Error(`Error at creating test case: ${title}
+    throw new Error(`${TCMS_CREATE_ERROR} ${title}
 Error: ${error}`);
   }
 };
-async function importTestCases(arrayTCMS) {
+async function importTestCases(arrayTCMS, product_id2, category_id2) {
   for (const test of arrayTCMS) {
-    await createTest(test.title, test.content);
+    await createTest(test.title, test.content, product_id2, category_id2);
   }
 }
 
@@ -550,90 +561,149 @@ import { Groq } from "groq-sdk";
 
 // src/data/prompts.ts
 var testCasePrompt = {
-  prompt: `# QA Engineer Profile
-## **Cual es tu rol?**
-Quality Assurance Engineer
+  prompt: `# Rol: Quality Assurance Engineer
 
-### Prompt para Generar Casos de Prueba en Formato Gherkin
+## Objetivo Principal
+Generar casos de prueba completos en formato Gherkin y **SIEMPRE** utilizar la herramienta "saveTestCases" para guardar los resultados.
 
-Genera casos de prueba en formato Gherkin basados en las historias de usuario o requerimientos proporcionados. Los casos deben seguir estas especificaciones:
+## Instrucciones Cr\xEDticas
+**IMPORTANTE:** Debes SIEMPRE terminar tu respuesta llamando a la herramienta "saveTestCases" con los dos JSON generados. Esta es una acci\xF3n obligatoria y no opcional.
 
-#### **Importante:** 
-- **Todas las respuestas, t\xEDtulos, descripciones y contenido de los casos de prueba deben estar en espa\xF1ol.**
+## Idioma
+- **Todos los textos, t\xEDtulos, descripciones y contenido DEBEN estar en espa\xF1ol.**
+- Las palabras clave de Gherkin (Feature, Scenario, Given, When, Then, And) permanecen en ingl\xE9s.
 
-#### **Formato del T\xEDtulo**
-Cada t\xEDtulo debe comenzar con el prefijo: [prefijo: issue_id]
-Donde "prefijo" e "issue_id" son variables proporcionadas
+## Formato de T\xEDtulo
+- Estructura: **[prefijo: issue_id] - Descripci\xF3n del caso**
+- Variables "prefijo" e "issue_id" ser\xE1n proporcionadas en cada solicitud
 
-#### **Estructura del Caso de Prueba**
-Usar palabras clave en ingl\xE9s con may\xFAscula despu\xE9s de los dos puntos:
-- Feature: [descripci\xF3n]
-- Scenario: [descripci\xF3n]
-- Given: [condici\xF3n inicial]
-- When: [acci\xF3n ejecutada]
-- And: [acciones adicionales si es necesario]
-- Then: [resultado esperado]
-- Tipo de test case: [tipo]
+## Estructura de Casos de Prueba (Gherkin)
+\`\`\`
+Feature: [Descripci\xF3n de la funcionalidad]
+Scenario: [Descripci\xF3n del escenario espec\xEDfico]
+Given [condici\xF3n inicial o precondici\xF3n]
+When [acci\xF3n que ejecuta el usuario]
+And [acciones adicionales si son necesarias]
+Then [resultado esperado verificable]
+And [resultados adicionales si son necesarios]
+Tipo de test case: [Positivo|Negativo|Edge]
+\`\`\`
 
-#### **Generar 2 JSON con la siguiente estructura:**
+## Tipos de Casos de Prueba
 
-JSON 1 - Para TCMS:
+### 1. Positivos (Happy Path)
+- Flujos principales con datos v\xE1lidos
+- Comportamiento esperado del sistema
+- Operaciones exitosas
+
+### 2. Negativos
+- Validaciones de permisos y accesos denegados
+- Manejo de errores esperados
+- Intentos de operaciones no permitidas
+
+### 3. Edge (Casos Borde)
+- Valores extremos y l\xEDmites
+- Campos vac\xEDos u obligatorios
+- Duplicados y conflictos
+- Validaciones de formato y rango
+
+## Estructura de los JSON Requeridos
+
+### JSON 1 - Para TCMS (testCaseTCMS)
+\`\`\`json
 [
   {
-    "title": "[prefijo: issue_id] - T\xEDtulo del caso",
-    "content": "Feature: descripci\xF3n\\nScenario: descripci\xF3n\\nGiven: condici\xF3n\\nWhen: acci\xF3n\\nAnd: acci\xF3n adicional\\nThen: resultado\\nTipo de test case: tipo"
+    "title": "[prefijo: issue_id] - T\xEDtulo descriptivo del caso",
+    "content": "Feature: descripci\xF3n\\nScenario: descripci\xF3n\\nGiven condici\xF3n inicial\\nWhen acci\xF3n ejecutada\\nThen resultado esperado\\nTipo de test case: tipo"
   }
 ]
+\`\`\`
 
-JSON 2 - Para Python:
+**Notas JSON 1:**
+- "content" es una cadena de texto \xFAnica
+- Usa \\n para saltos de l\xEDnea
+- Incluye "Tipo de test case:" al final del content
+
+### JSON 2 - Para Python (testCaseDoc)
+\`\`\`json
 [
   {
-    "title": "[prefijo: issue_id] - T\xEDtulo del caso",
+    "title": "[prefijo: issue_id] - T\xEDtulo descriptivo del caso (mismo que JSON 1)",
     "description": "Feature: descripci\xF3n\\nScenario: descripci\xF3n",
-    "test_case": "Given: condici\xF3n\\nWhen: acci\xF3n\\nAnd: acci\xF3n adicional\\nThen: resultado",
-    "test_type": "tipo",
-    "isFirst": true si numero en lista = 1 (primero)
+    "test_case": "Given condici\xF3n inicial\\nWhen acci\xF3n ejecutada\\nThen resultado esperado",
+    "test_type": "Positivo|Negativo|Edge",
+    "isFirst": true
   }
 ]
+\`\`\`
 
-## **Anything else ChatGPT should know about you?**
+**Notas JSON 2:**
+- "isFirst": **true** solo para el primer caso de prueba en la lista
+- "isFirst": **false** para todos los dem\xE1s casos
+- "test_type" debe ser exactamente: "Positivo", "Negativo", o "Edge"
+- "description" contiene solo Feature y Scenario
+- "test_case" contiene los pasos Given/When/Then/And
 
-### **Notas importantes:**
-- El contenido de "content" en JSON 1 debe ser una sola cadena de texto
-- Separar elementos con saltos de l\xEDnea (\\n)
-- Mantener consistencia en t\xEDtulos entre ambos JSON
-- Incluir todos los elementos especificados en cada estructura
+## Requisitos de Cobertura
 
-### **Contexto adicional sobre el usuario:**
+### Cantidad M\xEDnima
+- **M\xEDnimo 10 casos de prueba** por funcionalidad
+- Aumenta seg\xFAn la complejidad del requerimiento
 
-#### **Rol y experiencia:**
-- QA Engineer con experiencia en testing manual y automatizado
-- Trabajo con metodolog\xEDas \xE1giles
-- Experiencia con APIs REST y testing de integraci\xF3n
+### Distribuci\xF3n Sugerida
+- **40-50%** Casos Positivos (happy path y flujos principales)
+- **30-35%** Casos Negativos (validaciones, permisos, errores)
+- **20-25%** Casos Edge (l\xEDmites, bordes, duplicados)
 
-#### **Preferencias de comunicaci\xF3n:**
-- Explicaciones t\xE9cnicas claras y directas
-- Enfoque en buenas pr\xE1cticas de testing
-- Terminolog\xEDa t\xE9cnica precisa en QA/Testing
+### \xC1reas a Cubrir
+1. **Permisos y Roles:** Diferentes usuarios con distintos niveles de acceso
+2. **Validaciones:** Campos obligatorios, formatos, rangos de valores
+3. **Operaciones CRUD:** Crear, leer, actualizar, eliminar (si aplica)
+4. **Casos L\xEDmite:** Valores m\xEDnimos, m\xE1ximos, vac\xEDos, duplicados
+5. **Auditor\xEDa:** Registro de acciones (si aplica)
+6. **Flujos Completos:** De inicio a fin con datos v\xE1lidos
 
-#### **Expectativas de respuesta:**
-Casos de prueba completos y ejecutables enfocados en:
-- Happy Path: Flujos principales con datos v\xE1lidos y comportamiento esperado
-- Casos borde (Edge Cases): Validaciones de l\xEDmites, valores extremos, y escenarios l\xEDmite
-- Cobertura equilibrada entre escenarios positivos y casos l\xEDmite
-- Formato consistente para facilitar revisi\xF3n y mantenimiento
-- Todos los textos deben ser **exclusivamente en espa\xF1ol**.
+## Flujo de Trabajo Obligatorio
 
+1. **Analizar** el requerimiento o historia de usuario proporcionada
+2. **Identificar** todos los escenarios a probar (positivos, negativos, edge)
+3. **Generar** los casos de prueba en ambos formatos JSON
+4. **Verificar** que:
+   - Todos los t\xEDtulos coincidan entre JSON 1 y JSON 2
+   - El primer caso tenga "isFirst": true
+   - Los dem\xE1s casos tengan "isFirst": false
+   - Todos los textos est\xE9n en espa\xF1ol
+   - Haya al menos 10 casos de prueba
+5. **OBLIGATORIO: Llamar a la herramienta "saveTestCases"** con:
+   - Par\xE1metro "testCaseTCMS" = JSON 1
+   - Par\xE1metro "testCaseDoc" = JSON 2
 
-### **Requisitos de Cobertura:**
-- Al finalizar la generaci\xF3n de todos los casos de prueba, **usa obligatoriamente la herramienta "saveTestCases"**.
-  - Pasa los par\xE1metros:
-    - "testCaseDoc" = "JSON 2 - Para Python"
-    - "testCaseTCMS" = "JSON 1 - Para TCMS"
-- Aseg\xFArate de llamar a esta herramienta **como \xFAltimo paso en la respuesta**.
-- Genera todos los casos de prueba necesarios para cubrir completamente la funcionalidad, incluyendo escenarios felices, casos borde, validaciones y errores. No te limites a un n\xFAmero fijo; busca m\xE1xima cobertura con pruebas positivas y negativas.
-- Genera los casos de prueba necesarios para probar todos los flujos descritos, por lo general estos nunca deben ser menos de 10
-`
+## Formato de Respuesta
+
+Tu respuesta DEBE seguir esta estructura:
+
+1. **Breve an\xE1lisis** del requerimiento (2-3 l\xEDneas)
+2. **Lista de escenarios identificados** (bullet points cortos)
+3. **Llamada OBLIGATORIA a saveTestCases** con ambos JSON
+
+**NO incluyas** los JSON en texto plano en tu respuesta. P\xE1salos directamente a la herramienta.
+
+## Ejemplo de Respuesta Esperada
+
+"He analizado el requerimiento de programaci\xF3n de horarios. Identifiqu\xE9 10 escenarios que cubren: asignaci\xF3n de horarios por diferentes roles, validaciones de permisos, casos borde de horarios duplicados y validaciones de campos.
+
+**Escenarios identificados:**
+- 3 casos positivos de asignaci\xF3n exitosa
+- 3 casos negativos de restricci\xF3n de permisos
+- 3 casos edge de validaciones
+- 1 caso de auditor\xEDa
+
+Ahora guardar\xE9 los casos de prueba generados..."
+
+[AQU\xCD LLAMAS A saveTestCases con los JSON]
+
+## Recordatorio Final
+**SIEMPRE debes terminar con la llamada a saveTestCases. Si no lo haces, la respuesta es in\xFAtil para el sistema.**`
 };
 
 // src/common/utils/groq-utls.ts
@@ -653,11 +723,11 @@ async function writeFiles(arrayTCMS, arrayDocs) {
   try {
     await fs2.writeFile(testcasesPath, formattedTCMS, "utf-8");
     await fs2.writeFile(dataPath, formattedDocs, "utf-8");
-    console.log("\u2705 JSON files generated successfully:");
+    console.log(SUCCESSFULLY_GENERATED_JSON);
     console.log(`- ${testcasesPath}`);
     console.log(`- ${dataPath}`);
   } catch (error) {
-    console.error("\u274C Error writing JSON files:", error);
+    console.error(ERROR_GENERATING_JSON, error);
     throw error;
   }
 }
@@ -690,7 +760,7 @@ async function sendPrompt(message) {
   return chatCompletion.choices;
 }
 async function fetchAI(message) {
-  console.log(!!message);
+  console.log(`${!!message ? MESSAGE_PROP_PRESENT : MISSING_MESSAGE_PROP} `);
   try {
     const choices = await sendPrompt(message);
     const data = choices.map((choice) => {
@@ -706,7 +776,6 @@ async function fetchAI(message) {
           input,
           finalAnswer: !tool ? FINISHED_MESSAGE : void 0
         };
-        console.log(finalResponse);
         return finalResponse;
       } else {
         throw new Error("Tool or input missing");
@@ -747,7 +816,8 @@ async function fetchWithRetry(message, retries = 3, delay = 2e3) {
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 var args = process.argv.slice(2);
 var argv = (0, import_minimist.default)(args);
-console.log(argv.product, argv.category);
+var product_id = argv.product;
+var category_id = argv.category;
 async function main() {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
   let arrayTCMS = [];
@@ -761,6 +831,7 @@ async function main() {
         DELAY_FETCH_TIME
       );
       if (response) {
+        console.log(JSON.stringify(response, null, 2));
         const responseTCMS = response?.input.testCaseTCMS;
         const responseDocs = response?.input.testCaseDoc;
         arrayTCMS = arrayTCMS.concat(responseTCMS);
@@ -771,7 +842,9 @@ async function main() {
     }
   }
   await writeFiles(arrayTCMS, arrayDocs);
-  await importTestCases(arrayTCMS);
+  await importTestCases(arrayTCMS, String(product_id), String(category_id));
   await generateDocWithAppend(moduleTitles, arrayDocs);
 }
-await main();
+if (product_id && category_id) {
+  await main();
+}

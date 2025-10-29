@@ -64,3 +64,29 @@ export const TOOLS: ChatCompletionTool[] = [
     },
   },
 ];
+
+export const MESSAGE_PROP_PRESENT = "✅ Message recived";
+
+export const MISSING_MESSAGE_PROP = "❌ No message is present";
+
+export const TCMS_CREATE_ERROR = "❌ Error at creating test case:";
+
+export const ERROR_EXTRACT_XML =
+  "Could not extract document.xml from one of the files";
+
+export const MISSING_CLOSING_TAG =
+  "Could not find closing body tag in original document";
+
+export const SUCCESS_MERGE = "✅ Documents merged successfully:";
+
+export const FAILED_MERGE = "❌ Error merging documents:";
+
+export const MISSING_ORIGINAL_DOC =
+  "✅ New document created (no original to merge)";
+
+export const GENERIC_ERROR = "❌ Error:";
+
+export const SUCCESSFULLY_GENERATED_JSON =
+  "✅ JSON files generated successfully:";
+
+export const ERROR_GENERATING_JSON = "❌ Error writing JSON files:";

@@ -6,6 +6,10 @@ import {
 } from "../types";
 import path from "node:path";
 import { promises as fs } from "node:fs";
+import {
+  ERROR_GENERATING_JSON,
+  SUCCESSFULLY_GENERATED_JSON,
+} from "../constants";
 
 // ===============================
 // Log object, action an params
@@ -49,11 +53,11 @@ export async function writeFiles(
     await fs.writeFile(testcasesPath, formattedTCMS, "utf-8");
     await fs.writeFile(dataPath, formattedDocs, "utf-8");
 
-    console.log("✅ JSON files generated successfully:");
+    console.log(SUCCESSFULLY_GENERATED_JSON);
     console.log(`- ${testcasesPath}`);
     console.log(`- ${dataPath}`);
   } catch (error) {
-    console.error("❌ Error writing JSON files:", error);
+    console.error(ERROR_GENERATING_JSON, error);
     throw error;
   }
 }

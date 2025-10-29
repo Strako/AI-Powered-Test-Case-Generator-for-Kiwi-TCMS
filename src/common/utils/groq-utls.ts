@@ -5,6 +5,8 @@ import {
   FAILED_MESSAGE,
   FETCHING_ERROR_MESSAGE,
   FINISHED_MESSAGE,
+  MESSAGE_PROP_PRESENT,
+  MISSING_MESSAGE_PROP,
   RETRY_FAILED,
   RETYING_MESSAGE,
   TOOLS,
@@ -51,7 +53,7 @@ export async function sendPrompt(message: string) {
 // Retrive message completition
 // ===============================
 export async function fetchAI(message: string) {
-  console.log(!!message);
+  console.log(`${!!message ? MESSAGE_PROP_PRESENT : MISSING_MESSAGE_PROP} `);
 
   try {
     const choices = await sendPrompt(message);
@@ -72,7 +74,7 @@ export async function fetchAI(message: string) {
           input,
           finalAnswer: !tool ? FINISHED_MESSAGE : undefined,
         };
-        console.log(finalResponse);
+        // console.log(finalResponse);
 
         return finalResponse;
       } else {

@@ -14,6 +14,14 @@ import {
 import * as fs from "node:fs";
 import PizZip from "pizzip";
 import { TestCaseDoc } from "../types";
+import {
+  ERROR_EXTRACT_XML,
+  FAILED_MERGE,
+  GENERIC_ERROR,
+  MISSING_CLOSING_TAG,
+  MISSING_ORIGINAL_DOC,
+  SUCCESS_MERGE,
+} from "../constants";
 
 // ===============================
 // Data types
@@ -148,14 +156,14 @@ async function mergeDocxFiles(
     const newDocXml = newZip.file("word/document.xml")?.asText();
 
     if (!originalDocXml || !newDocXml) {
-      throw new Error("Could not extract document.xml from one of the files");
+      throw new Error(ERROR_EXTRACT_XML);
     }
 
     const bodyEndTag = "</w:body>";
     const bodyEndIndex = originalDocXml.lastIndexOf(bodyEndTag);
 
     if (bodyEndIndex === -1) {
-      throw new Error("Could not find closing body tag in original document");
+      throw new Error(MISSING_CLOSING_TAG);
     }
 
     const newBodyStart = newDocXml.indexOf("<w:body>") + "<w:body>".length;
@@ -190,9 +198,9 @@ async function mergeDocxFiles(
     });
 
     fs.writeFileSync(outputPath, mergedBuffer);
-    console.log(`✅ Documents merged successfully: ${outputPath}`);
+    console.log(`${SUCCESS_MERGE} \n- ${outputPath}`);
   } catch (error) {
-    throw new Error(`❌ Error merging documents: ${error}`);
+    throw new Error(`${FAILED_MERGE} ${error}`);
   }
 }
 
@@ -212,14 +220,14 @@ export default async function generateDocWithAppend(
 
     if (!fs.existsSync(originalDocPath)) {
       fs.writeFileSync(outputPath, newContentBuffer);
-      console.log("✅ New document created (no original to merge)");
+      console.log(MISSING_ORIGINAL_DOC);
       return;
     }
 
     console.log("🔗 Merging with original document...");
     await mergeDocxFiles(originalDocPath, newContentBuffer, outputPath);
   } catch (error) {
-    console.error("❌ Error:", error);
+    console.error(GENERIC_ERROR, error);
     throw error;
   }
 }

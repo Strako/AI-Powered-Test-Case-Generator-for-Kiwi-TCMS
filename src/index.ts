@@ -17,7 +17,8 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const args = process.argv.slice(2);
 const argv = minimist(args);
 
-console.log(argv.product, argv.category);
+const product_id = argv.product;
+const category_id = argv.category;
 
 async function main() {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
@@ -33,6 +34,8 @@ async function main() {
         DELAY_FETCH_TIME,
       );
       if (response) {
+        console.log(JSON.stringify(response, null, 2));
+
         const responseTCMS = response?.input.testCaseTCMS;
         const responseDocs = response?.input.testCaseDoc;
 
@@ -45,9 +48,11 @@ async function main() {
   }
   await writeFiles(arrayTCMS, arrayDocs);
 
-  await importTestCases(arrayTCMS);
+  await importTestCases(arrayTCMS, String(product_id), String(category_id));
 
   await generateDocWithAppend(moduleTitles, arrayDocs);
 }
 
-await main();
+if (product_id && category_id) {
+  await main();
+}
