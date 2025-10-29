@@ -1,12 +1,14 @@
 /* eslint-disable no-console */
 import fetch from "node-fetch";
 import { TestCaseTCMS } from "../types";
-import { TCMS_CREATE_ERROR } from "../constants";
+import { NO_DEFAULT_USER, TCMS_CREATE_ERROR } from "../constants";
+import dotenv from "dotenv";
+dotenv.config();
 
 const csrfmiddlewaretoken =
-  "Jg3NMswgazneySVu6H8alegPTWuFExCng58yV4h5KnqRvdkSHzVWnpI0KBLHyaRY";
+  "7dAyJJHXJK8JJSalfn3ca1DNh27H5DhmE2FjSlsMjybmGdzJQfQYcc5Y8HoJZgwX";
 const csrftoken = "HZfVjMVZKYdN7vzyL2XWclCl1Prc4NpL";
-const default_tester = "armando";
+const default_tester = process.env.DEFAULT_TESTER;
 const sessionid = "p1fli3ebbai6abovt7kbyx9ear2y1r2l";
 
 const headers = (
@@ -66,6 +68,9 @@ export default async function importTestCases(
   product_id: string,
   category_id: string,
 ) {
+  if (!default_tester) {
+    throw new Error(NO_DEFAULT_USER);
+  }
   for (const test of arrayTCMS) {
     await createTest(test.title, test.content, product_id, category_id);
   }

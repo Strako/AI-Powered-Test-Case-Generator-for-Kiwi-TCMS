@@ -313,6 +313,7 @@ var MISSING_ORIGINAL_DOC = "\u2705 New document created (no original to merge)";
 var GENERIC_ERROR = "\u274C Error:";
 var SUCCESSFULLY_GENERATED_JSON = "\u2705 JSON files generated successfully:";
 var ERROR_GENERATING_JSON = "\u274C Error writing JSON files:";
+var NO_DEFAULT_USER = "No default user provided add 'DEFAULT_TESTER' to .env";
 
 // src/common/utils/doc-utils.ts
 import {
@@ -478,9 +479,11 @@ async function generateDocWithAppend(titles, data) {
 
 // src/common/utils/import-test-cases.ts
 import fetch from "node-fetch";
-var csrfmiddlewaretoken = "Jg3NMswgazneySVu6H8alegPTWuFExCng58yV4h5KnqRvdkSHzVWnpI0KBLHyaRY";
+import dotenv from "dotenv";
+dotenv.config();
+var csrfmiddlewaretoken = "7dAyJJHXJK8JJSalfn3ca1DNh27H5DhmE2FjSlsMjybmGdzJQfQYcc5Y8HoJZgwX";
 var csrftoken = "HZfVjMVZKYdN7vzyL2XWclCl1Prc4NpL";
-var default_tester = "armando";
+var default_tester = process.env.DEFAULT_TESTER;
 var sessionid = "p1fli3ebbai6abovt7kbyx9ear2y1r2l";
 var headers = (title, content, product_id2, category_id2) => ({
   headers: {
@@ -517,6 +520,9 @@ Error: ${error}`);
   }
 };
 async function importTestCases(arrayTCMS, product_id2, category_id2) {
+  if (!default_tester) {
+    throw new Error(NO_DEFAULT_USER);
+  }
   for (const test of arrayTCMS) {
     await createTest(test.title, test.content, product_id2, category_id2);
   }
@@ -707,7 +713,7 @@ Ahora guardar\xE9 los casos de prueba generados..."
 };
 
 // src/common/utils/groq-utls.ts
-import dotenv from "dotenv";
+import dotenv2 from "dotenv";
 
 // src/common/utils/utils.ts
 import path from "node:path";
@@ -734,7 +740,7 @@ async function writeFiles(arrayTCMS, arrayDocs) {
 
 // src/common/utils/groq-utls.ts
 import { exit } from "node:process";
-dotenv.config();
+dotenv2.config();
 var prompt = testCasePrompt.prompt;
 var options = {
   apiKey: process.env.GROQ_API_KEY

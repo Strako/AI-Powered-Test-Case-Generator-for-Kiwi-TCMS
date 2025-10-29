@@ -90,3 +90,6 @@ export const SUCCESSFULLY_GENERATED_JSON =
   "✅ JSON files generated successfully:";
 
 export const ERROR_GENERATING_JSON = "❌ Error writing JSON files:";
+
+export const NO_DEFAULT_USER =
+  "No default user provided add 'DEFAULT_TESTER' to .env";
