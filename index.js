@@ -314,6 +314,7 @@ var GENERIC_ERROR = "\u274C Error:";
 var SUCCESSFULLY_GENERATED_JSON = "\u2705 JSON files generated successfully:";
 var ERROR_GENERATING_JSON = "\u274C Error writing JSON files:";
 var NO_DEFAULT_USER = "No default user provided add 'DEFAULT_TESTER' to .env";
+var MISSING_PARAMS = "Missing params: -- --product=x --category=y";
 
 // src/common/utils/doc-utils.ts
 import {
@@ -851,6 +852,8 @@ async function main() {
   await importTestCases(arrayTCMS, String(product_id), String(category_id));
   await generateDocWithAppend(moduleTitles, arrayDocs);
 }
-if (product_id && category_id) {
+if (!product_id || !category_id) {
+  console.error(MISSING_PARAMS);
+} else {
   await main();
 }

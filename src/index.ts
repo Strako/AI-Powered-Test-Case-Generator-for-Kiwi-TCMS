@@ -1,5 +1,6 @@
 import {
   DELAY_FETCH_TIME,
+  MISSING_PARAMS,
   NUMBER_OF_RETRIES,
   REQUIREMENTS_PATH,
 } from "./common/constants";
@@ -53,6 +54,8 @@ async function main() {
   await generateDocWithAppend(moduleTitles, arrayDocs);
 }
 
-if (product_id && category_id) {
+if (!product_id || !category_id) {
+  console.error(MISSING_PARAMS);
+} else {
   await main();
 }

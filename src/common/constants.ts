@@ -93,3 +93,5 @@ export const ERROR_GENERATING_JSON = "❌ Error writing JSON files:";
 
 export const NO_DEFAULT_USER =
   "No default user provided add 'DEFAULT_TESTER' to .env";
+
+export const MISSING_PARAMS = "Missing params: -- --product=x --category=y";
