@@ -437,7 +437,6 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 - 📚 [Official Documentation](https://kiwitcms.readthedocs.io/)
 - 🐳 [Docker Installation Guide](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html)
 - 🔌 [API Documentation](https://kiwitcms.readthedocs.io/en/latest/api/index.html)
-- 💬 [Community Support](https://github.com/kiwitcms/Kiwi/discussions)
 
 ## Output Files
 
