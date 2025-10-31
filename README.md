@@ -238,25 +238,25 @@ DEFAULT_TESTER=admin
 
 **Structure:**
 
-| Column               | Type   | Required | Description                                   | Example                       |
-| -------------------- | ------ | -------- | --------------------------------------------- | ----------------------------- |
-| **Módulo**           | String | Yes      | Module/feature name (creates section headers) | "Gestión de Usuarios"         |
-| **Descripción**      | String | Yes      | Brief functionality description               | "Registro de nuevos usuarios" |
-| **ID Requerimiento** | String | Yes      | Unique requirement identifier                 | "REQ-001"                     |
-| **Requerimiento**    | String | Yes      | Detailed requirement description              | "El sistema debe permitir..." |
-| **Consideración**    | String | Optional | Additional constraints or notes               | "Validar formato de email"    |
+| Column             | Type   | Required | Description                                   | Example                     |
+| ------------------ | ------ | -------- | --------------------------------------------- | --------------------------- |
+| **Module**         | String | Yes      | Module/feature name (creates section headers) | "User Management"           |
+| **Description**    | String | Yes      | Brief functionality description               | "User registration process" |
+| **Requirement ID** | String | Yes      | Unique requirement identifier                 | "REQ-001"                   |
+| **Requirement**    | String | Yes      | Detailed requirement description              | "The system must allow..."  |
+| **Consideration**  | String | Optional | Additional constraints or notes               | "Validate email format"     |
 
 **Example Content:**
 
 ```
-| Módulo              | Descripción                  | ID Requerimiento | Requerimiento                                      | Consideración                    |
+| Module              | Description                  | Requirement ID   | Requirement                                        | Consideration                    |
 |---------------------|------------------------------|------------------|----------------------------------------------------|----------------------------------|
-| Gestión de Usuarios | Registro de nuevos usuarios  | REQ-001          | El sistema debe permitir el registro con email     | Validar formato y unicidad       |
-| Gestión de Usuarios | Login de usuarios            | REQ-002          | El sistema debe autenticar usuarios con credenciales| Máximo 3 intentos fallidos      |
-| Gestión de Productos| Crear nuevo producto         | REQ-003          | Permitir crear productos con nombre y precio       | Precio debe ser mayor a 0        |
+| User Management     | User registration process    | REQ-001          | The system must allow registration with email      | Validate format and uniqueness   |
+| User Management     | User login functionality     | REQ-002          | The system must authenticate users with credentials| Maximum 3 failed attempts       |
+| Product Management  | Create new product           | REQ-003          | Allow creating products with name and price        | Price must be greater than 0     |
 ```
 
-**Template File:** Use `template_requirements_example.xlsx` as a reference
+**Template File:** Use `template_requirements_example.xlsx` as a reference (columns are in English)
 
 ### 2. Original Document (Optional)
 
