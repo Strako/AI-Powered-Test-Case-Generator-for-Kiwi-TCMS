@@ -939,6 +939,7 @@ async function main(user2, password2) {
         DELAY_FETCH_TIME
       );
       if (response) {
+        console.log(JSON.stringify(response, null, 2));
         const responseTCMS = response?.input.testCaseTCMS;
         const responseDocs = response?.input.testCaseDoc;
         arrayTCMS = arrayTCMS.concat(responseTCMS);

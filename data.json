@@ -1,86 +1,72 @@
 [
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Superadministrador accede al módulo",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Superadministrador asigna horario exitosamente",
     "isFirst": true,
-    "test_case": "Given el usuario es un Superadministrador y ha iniciado sesión\nWhen el usuario navega a la URL del módulo de programación de horarios\nThen el usuario debe ver la pantalla del módulo de asignación de horarios",
+    "test_case": "Given el usuario es Superadministrador y se encuentra en la página principal\nWhen hace clic en \"Programación de horarios\" y asigna un horario válido\nThen el horario se crea correctamente y aparece en la lista de horarios",
     "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Superadministrador accede al módulo de programación de horarios"
+    "title": "[RH-HOR: RH-HOR-001] - Superadministrador asigna horario exitosamente"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Superadministrador asigna un nuevo horario",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Auxiliar administrativo asigna horario exitosamente",
     "isFirst": false,
-    "test_case": "Given el usuario es un Superadministrador y tiene acceso al módulo de asignación\nWhen el usuario ingresa datos del horario (fecha, turno, empleado) y hace clic en \"Asignar\"\nThen el horario se crea correctamente y aparece en la lista de horarios",
+    "test_case": "Given el usuario es Auxiliar administrativo\nWhen asigna un horario válido\nThen el horario se crea correctamente y aparece en la lista de horarios",
     "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Superadministrador asigna un nuevo horario"
+    "title": "[RH-HOR: RH-HOR-001] - Auxiliar administrativo asigna horario exitosamente"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Auxiliar administrativo accede al módulo",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Gerente de tienda aprueba horario exitosamente",
     "isFirst": false,
-    "test_case": "Given el usuario es Auxiliar administrativo y ha iniciado sesión\nWhen navega a la URL del módulo\nThen se muestra la pantalla del módulo con opción de asignar horarios",
+    "test_case": "Given el usuario es Gerente de tienda y hay un horario pendiente de aprobación\nWhen aprueba el horario\nThen el horario se marca como aprobado",
     "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Auxiliar administrativo accede al módulo de programación de horarios"
+    "title": "[RH-HOR: RH-HOR-001] - Gerente de tienda aprueba horario exitosamente"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Auxiliar administrativo asigna un nuevo horario",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Usuario sin rol intenta acceder al módulo y recibe mensaje de acceso restringido",
     "isFirst": false,
-    "test_case": "Given el usuario es Auxiliar administrativo y tiene acceso al módulo de asignación\nWhen el usuario ingresa datos del horario (fecha, turno, empleado) y hace clic en \"Asignar\"\nThen el horario se crea correctamente y aparece en la lista de horarios",
-    "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Auxiliar administrativo asigna un nuevo horario"
-  },
-  {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda accede al módulo",
-    "isFirst": false,
-    "test_case": "Given el usuario es Gerente de tienda y ha iniciado sesión\nWhen navega a la URL del módulo\nThen se muestra la pantalla del módulo con opción de aprobar horarios",
-    "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda accede al módulo de programación de horarios"
-  },
-  {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda aprueba un horario",
-    "isFirst": false,
-    "test_case": "Given el usuario es Gerente de tienda y tiene un horario pendiente de aprobación\nWhen el usuario hace clic en \"Aprobar\" junto al horario\nThen el horario se marca como aprobado y el usuario recibe una confirmación",
-    "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda aprueba un horario"
-  },
-  {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda intenta asignar un horario (negativo)",
-    "isFirst": false,
-    "test_case": "Given el usuario es Gerente de tienda y tiene acceso al módulo\nWhen intenta asignar un nuevo horario\nThen se muestra mensaje de error \"No tienes permiso para asignar horarios\" y no se crea el horario",
+    "test_case": "Given el usuario es Cliente\nWhen intenta acceder al módulo de programación de horarios\nThen se muestra mensaje \"Acceso restringido\"",
     "test_type": "Negativo",
-    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda intenta asignar un horario (negativo)"
+    "title": "[RH-HOR: RH-HOR-001] - Usuario sin rol intenta acceder al módulo y recibe mensaje de acceso restringido"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Usuario no autorizado intenta acceder al módulo (negativo)",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Gerente de tienda intenta asignar horario y recibe mensaje de no autorizado",
     "isFirst": false,
-    "test_case": "Given el usuario es Cliente y ha iniciado sesión\nWhen intenta acceder a la URL del módulo de programación de horarios\nThen se muestra mensaje de acceso restringido y se redirige a la página principal",
+    "test_case": "Given el usuario es Gerente de tienda\nWhen intenta asignar un horario\nThen se muestra mensaje \"No autorizado para asignar horarios\"",
     "test_type": "Negativo",
-    "title": "[Programación de horarios: RH-HOR-001] - Usuario no autorizado intenta acceder al módulo (negativo)"
+    "title": "[RH-HOR: RH-HOR-001] - Gerente de tienda intenta asignar horario y recibe mensaje de no autorizado"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Usuario no autorizado intenta asignar un horario (negativo)",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Usuario con rol nulo intenta acceder al módulo y recibe mensaje de acceso restringido",
     "isFirst": false,
-    "test_case": "Given el usuario es Cliente\nWhen intenta asignar un horario\nThen se muestra mensaje de acceso restringido",
+    "test_case": "Given el usuario tiene rol nulo\nWhen intenta acceder al módulo\nThen se muestra mensaje \"Acceso restringido\"",
     "test_type": "Negativo",
-    "title": "[Programación de horarios: RH-HOR-001] - Usuario no autorizado intenta asignar un horario (negativo)"
+    "title": "[RH-HOR: RH-HOR-001] - Usuario con rol nulo intenta acceder al módulo y recibe mensaje de acceso restringido"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Asignación de horario registrada en auditoría (positivo)",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Usuario con doble rol (Superadministrador y Gerente) realiza asignación y aprobación",
     "isFirst": false,
-    "test_case": "Given el usuario es Superadministrador y ha asignado un horario\nWhen se verifica la bitácora de auditoría\nThen existe una entrada que registra la acción de asignación con fecha/hora y usuario",
-    "test_type": "Positivo",
-    "title": "[Programación de horarios: RH-HOR-001] - Asignación de horario registrada en auditoría (positivo)"
-  },
-  {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Intento no autorizado registrado en auditoría (edge)",
-    "isFirst": false,
-    "test_case": "Given el usuario es Cliente intenta acceder o asignar\nWhen se revisa bitácora de auditoría\nThen hay una entrada que registra intento de acceso no autorizado con fecha/hora",
+    "test_case": "Given el usuario tiene roles Superadministrador y Gerente de tienda\nWhen asigna un horario y luego aprueba otro horario\nThen ambos procesos se completan correctamente",
     "test_type": "Edge",
-    "title": "[Programación de horarios: RH-HOR-001] - Intento no autorizado registrado en auditoría (edge)"
+    "title": "[RH-HOR: RH-HOR-001] - Usuario con doble rol (Superadministrador y Gerente) realiza asignación y aprobación"
   },
   {
-    "description": "Feature: Módulo de programación de horarios por rol\nScenario: Asignación de horario con datos faltantes (edge)",
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Usuario con roles vacíos intenta acceder al módulo y recibe mensaje de acceso restringido",
     "isFirst": false,
-    "test_case": "Given el usuario es Auxiliar administrativo\nWhen intenta asignar horario sin indicar el empleado\nThen se muestra mensaje de error \"Campo empleado obligatorio\" y no se crea el horario",
+    "test_case": "Given el usuario tiene roles vacíos\nWhen intenta acceder al módulo de programación de horarios\nThen se muestra mensaje \"Acceso restringido\"",
     "test_type": "Edge",
-    "title": "[Programación de horarios: RH-HOR-001] - Asignación de horario con datos faltantes (edge)"
+    "title": "[RH-HOR: RH-HOR-001] - Usuario con roles vacíos intenta acceder al módulo y recibe mensaje de acceso restringido"
+  },
+  {
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Auditoría registra asignación de horario por Superadministrador",
+    "isFirst": false,
+    "test_case": "Given el usuario es Superadministrador y asigna un horario\nWhen el sistema registra la acción\nThen la bitácora contiene entrada con usuario, acción \"Asignar horario\" y timestamp",
+    "test_type": "Positivo",
+    "title": "[RH-HOR: RH-HOR-001] - Auditoría registra asignación de horario por Superadministrador"
+  },
+  {
+    "description": "Feature: Acceso y gestión de horarios según roles\nScenario: Auditoría registra intento de acceso no autorizado",
+    "isFirst": false,
+    "test_case": "Given el usuario es Cliente intenta acceder\nWhen el acceso es denegado\nThen la bitácora contiene entrada con usuario, acción \"Intento de acceso\" y tipo \"denegado\"",
+    "test_type": "Edge",
+    "title": "[RH-HOR: RH-HOR-001] - Auditoría registra intento de acceso no autorizado"
   }
 ]

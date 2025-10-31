@@ -49,8 +49,8 @@ async function main(user: string, password: string) {
         DELAY_FETCH_TIME,
       );
       if (response) {
-        /*         console.log(JSON.stringify(response, null, 2));
-         */
+        console.log(JSON.stringify(response, null, 2));
+
         const responseTCMS = response?.input.testCaseTCMS;
         const responseDocs = response?.input.testCaseDoc;
 
