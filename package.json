@@ -16,7 +16,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node index.js",
     "watch": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv --watch",
     "build": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv"
   },

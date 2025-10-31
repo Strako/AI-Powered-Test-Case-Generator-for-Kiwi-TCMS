@@ -95,3 +95,15 @@ export const NO_DEFAULT_USER =
   "No default user provided add 'DEFAULT_TESTER' to .env";
 
 export const MISSING_PARAMS = "Missing params: -- --product=x --category=y";
+
+export const MISSING_CREDENTIALS =
+  "Missing credentials: TCMS_USER or TCMS_PASSWORD missing in .env";
+
+export const MISSING_REQUIREMENTS_FILE = "File ./requirements.xlsx wont exist";
+
+export const LOGIN_FAILED = "❌ Login failed: Missing:";
+
+export const CSRF_MISSMATCH =
+  "❌ csrfmiddlewaretoken not found in /cases/new page (possible session or CSRF mismatch)";
+
+export const LOGIN_SUCCESSFULLY = "✅ Login successfully !";

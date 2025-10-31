@@ -1,4 +1,6 @@
+import { existsSync } from "fs";
 import { createRequire } from "module";
+import { MISSING_REQUIREMENTS_FILE } from "../constants";
 const require = createRequire(import.meta.url);
 const XLSX = require("xlsx");
 
@@ -17,6 +19,11 @@ export function parseRequirements(filePath: string): {
   moduleTitles: string[];
   requirements: RequirementObject[];
 } {
+  const fileExist = existsSync(filePath);
+  if (!fileExist) {
+    throw new Error(MISSING_REQUIREMENTS_FILE);
+  }
+
   // Read the Excel file
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];

@@ -315,6 +315,11 @@ var SUCCESSFULLY_GENERATED_JSON = "\u2705 JSON files generated successfully:";
 var ERROR_GENERATING_JSON = "\u274C Error writing JSON files:";
 var NO_DEFAULT_USER = "No default user provided add 'DEFAULT_TESTER' to .env";
 var MISSING_PARAMS = "Missing params: -- --product=x --category=y";
+var MISSING_CREDENTIALS = "Missing credentials: TCMS_USER or TCMS_PASSWORD missing in .env";
+var MISSING_REQUIREMENTS_FILE = "File ./requirements.xlsx wont exist";
+var LOGIN_FAILED = "\u274C Login failed: Missing:";
+var CSRF_MISSMATCH = "\u274C csrfmiddlewaretoken not found in /cases/new page (possible session or CSRF mismatch)";
+var LOGIN_SUCCESSFULLY = "\u2705 Login successfully !";
 
 // src/common/utils/doc-utils.ts
 import {
@@ -479,14 +484,11 @@ async function generateDocWithAppend(titles, data) {
 }
 
 // src/common/utils/import-test-cases.ts
-import fetch from "node-fetch";
+import fetch2 from "node-fetch";
 import dotenv from "dotenv";
 dotenv.config();
-var csrfmiddlewaretoken = "7dAyJJHXJK8JJSalfn3ca1DNh27H5DhmE2FjSlsMjybmGdzJQfQYcc5Y8HoJZgwX";
-var csrftoken = "HZfVjMVZKYdN7vzyL2XWclCl1Prc4NpL";
 var default_tester = process.env.DEFAULT_TESTER;
-var sessionid = "p1fli3ebbai6abovt7kbyx9ear2y1r2l";
-var headers = (title, content, product_id2, category_id2) => ({
+var headers = (title, content, product_id2, category_id2, session) => ({
   headers: {
     accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
     "accept-language": "en",
@@ -498,45 +500,59 @@ var headers = (title, content, product_id2, category_id2) => ({
     "sec-fetch-site": "same-origin",
     "sec-fetch-user": "?1",
     "upgrade-insecure-requests": "1",
-    cookie: `NEXT_LOCALE=es; _fbp=fb.0.1757619907010.549046907627441429; _ga=GA1.1.1097585688.1757619907; __stripe_mid=e6e228bc-bbd1-4fec-8e40-ac6089c2fd6f1ef505; _ga_WE7JYK3W5B=GS2.1.s1757619907$o1$g1$t1757622540$j60$l0$h0; csrftoken=${csrftoken}; sessionid=${sessionid}; _dd_s=logs=1&id=6ad4b8c6-cb10-4c59-bcd0-666d90616351&created=1760546518282&expire=1760549321739`,
+    cookie: `NEXT_LOCALE=es; _fbp=fb.0.1757619907010.549046907627441429; _ga=GA1.1.1097585688.1757619907; __stripe_mid=e6e228bc-bbd1-4fec-8e40-ac6089c2fd6f1ef505; _ga_WE7JYK3W5B=GS2.1.s1757619907$o1$g1$t1757622540$j60$l0$h0; csrftoken=${session.csrftoken}; sessionid=${session.sessionid}; _dd_s=logs=1&id=6ad4b8c6-cb10-4c59-bcd0-666d90616351&created=1760546518282&expire=1760549321739`,
     Referer: "https://localhost/cases/new/"
   },
-  body: `csrfmiddlewaretoken=${csrfmiddlewaretoken}&author=2&summary=${title}&default_tester=${default_tester}&product=${product_id2}&category=${category_id2}&case_status=2&priority=1&setup_duration=0&testing_duration=0&text=${content}&script=&arguments=&requirement=&extra_link=&notes=&email_settings-0-auto_to_case_author=on&email_settings-0-auto_to_run_manager=on&email_settings-0-auto_to_execution_assignee=on&email_settings-0-auto_to_case_tester=on&email_settings-0-auto_to_run_tester=on&email_settings-0-notify_on_case_update=on&email_settings-0-notify_on_case_delete=on&email_settings-0-cc_list=&email_settings-0-case=&email_settings-0-id=&email_settings-TOTAL_FORMS=1&email_settings-INITIAL_FORMS=0&email_settings-MIN_NUM_FORMS=0&email_settings-MAX_NUM_FORMS=1`,
+  body: `csrfmiddlewaretoken=${session.csrfmiddlewaretoken}&author=2&summary=${title}&default_tester=${default_tester}&product=${product_id2}&category=${category_id2}&case_status=2&priority=1&setup_duration=0&testing_duration=0&text=${content}&script=&arguments=&requirement=&extra_link=&notes=&email_settings-0-auto_to_case_author=on&email_settings-0-auto_to_run_manager=on&email_settings-0-auto_to_execution_assignee=on&email_settings-0-auto_to_case_tester=on&email_settings-0-auto_to_run_tester=on&email_settings-0-notify_on_case_update=on&email_settings-0-notify_on_case_delete=on&email_settings-0-cc_list=&email_settings-0-case=&email_settings-0-id=&email_settings-TOTAL_FORMS=1&email_settings-INITIAL_FORMS=0&email_settings-MIN_NUM_FORMS=0&email_settings-MAX_NUM_FORMS=1`,
   method: "POST"
 });
-var createTest = async (title, content, product_id2, category_id2) => {
+var createTest = async (title, content, product_id2, category_id2, session) => {
+  console.log(
+    session,
+    headers(title, content, product_id2, category_id2, session)
+  );
   let response;
   try {
-    response = await fetch(
+    response = await fetch2(
       "https://localhost/cases/new/",
-      headers(title, content, product_id2, category_id2)
+      headers(title, content, product_id2, category_id2, session)
     );
-    if (response.ok) {
-      const status = await response.status;
-      console.log(status);
-    }
+    const status = response.status;
+    console.log(`${response.ok ? "\u2705" : "\u274C"} ${status}`);
   } catch (error) {
     throw new Error(`${TCMS_CREATE_ERROR} ${title}
 Error: ${error}`);
   }
 };
-async function importTestCases(arrayTCMS, product_id2, category_id2) {
+async function importTestCases(arrayTCMS, product_id2, category_id2, session) {
   if (!default_tester) {
     throw new Error(NO_DEFAULT_USER);
   }
   for (const test of arrayTCMS) {
-    await createTest(test.title, test.content, product_id2, category_id2);
+    await createTest(
+      test.title,
+      test.content,
+      product_id2,
+      category_id2,
+      session
+    );
   }
 }
 
 // src/index.ts
 var import_minimist = __toESM(require_minimist(), 1);
+import dotenv3 from "dotenv";
 
 // src/common/utils/read-requirements.ts
+import { existsSync as existsSync2 } from "fs";
 import { createRequire } from "module";
 var require2 = createRequire(import.meta.url);
 var XLSX = require2("xlsx");
 function parseRequirements(filePath) {
+  const fileExist = existsSync2(filePath);
+  if (!fileExist) {
+    throw new Error(MISSING_REQUIREMENTS_FILE);
+  }
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const sheet = workbook.Sheets[sheetName];
@@ -738,6 +754,81 @@ async function writeFiles(arrayTCMS, arrayDocs) {
     throw error;
   }
 }
+async function login(user2, password2) {
+  const baseUrl = "https://localhost/accounts/login/";
+  const newCaseUrl = "https://localhost/cases/new/";
+  const getResp = await fetch(baseUrl, {
+    method: "GET",
+    headers: {
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en",
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      "Upgrade-Insecure-Requests": "1"
+    }
+  });
+  const htmlLogin = await getResp.text();
+  const loginTokenMatch = htmlLogin.match(
+    /<input[^>]*name=["']csrfmiddlewaretoken["'][^>]*value=["']([^"']+)["']/
+  );
+  const csrfmiddlewaretokenLogin = loginTokenMatch ? loginTokenMatch[1] : null;
+  if (!csrfmiddlewaretokenLogin) {
+    throw new Error("csrfmiddlewaretoken not found in login page HTML");
+  }
+  const setCookies = getResp.headers.get("set-cookie") ?? "";
+  const formBody = new URLSearchParams({
+    csrfmiddlewaretoken: csrfmiddlewaretokenLogin,
+    next: "",
+    username: user2,
+    password: password2
+  }).toString();
+  const postResp = await fetch(baseUrl, {
+    method: "POST",
+    headers: {
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      "Accept-Language": "en",
+      "Cache-Control": "no-cache",
+      "Content-Type": "application/x-www-form-urlencoded",
+      Pragma: "no-cache",
+      Referer: baseUrl,
+      Cookie: setCookies
+    },
+    body: formBody,
+    redirect: "manual"
+  });
+  const postCookies = postResp.headers.get("set-cookie") || "";
+  const sessionidMatch = postCookies.match(/sessionid=([^;]+)/);
+  const newCsrftokenMatch = postCookies.match(/csrftoken=([^;]+)/);
+  const sessionid = sessionidMatch ? sessionidMatch[1] : null;
+  const csrftoken = newCsrftokenMatch ? newCsrftokenMatch[1] : null;
+  if (!csrftoken || !sessionid) {
+    throw new Error(
+      `${LOGIN_FAILED} ${!csrftoken ? "csrftoken " : ""}${!sessionid ? "sessionid" : ""}`
+    );
+  }
+  const getNewCaseResp = await fetch(newCaseUrl, {
+    method: "GET",
+    headers: {
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en",
+      Cookie: `csrftoken=${csrftoken}; sessionid=${sessionid}`
+    }
+  });
+  const htmlCases = await getNewCaseResp.text();
+  const newTokenMatch = htmlCases.match(
+    /<input[^>]*name=["']csrfmiddlewaretoken["'][^>]*value=["']([^"']+)["']/
+  );
+  const csrfmiddlewaretokenNew = newTokenMatch ? newTokenMatch[1] : null;
+  if (!csrfmiddlewaretokenNew) {
+    throw new Error(CSRF_MISSMATCH);
+  }
+  console.log(LOGIN_SUCCESSFULLY);
+  return {
+    csrftoken,
+    sessionid,
+    csrfmiddlewaretoken: csrfmiddlewaretokenNew
+  };
+}
 
 // src/common/utils/groq-utls.ts
 import { exit } from "node:process";
@@ -753,8 +844,9 @@ async function sendPrompt(message) {
       { role: "system", content: prompt },
       { role: "user", content: message }
     ],
-    /*     model: "openai/gpt-oss-20b",*/
-    model: "openai/gpt-oss-120b",
+    model: "openai/gpt-oss-20b",
+    /*     model: "openai/gpt-oss-120b",
+     */
     temperature: 1,
     max_completion_tokens: 8192,
     top_p: 1,
@@ -820,15 +912,24 @@ async function fetchWithRetry(message, retries = 3, delay = 2e3) {
 }
 
 // src/index.ts
+dotenv3.config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+var user = process.env.TCMS_USER;
+var password = process.env.TCMS_PASSWORD;
 var args = process.argv.slice(2);
 var argv = (0, import_minimist.default)(args);
 var product_id = argv.product;
 var category_id = argv.category;
-async function main() {
+var missingParams = !product_id || !category_id;
+var missingCredentials = !user || !password;
+async function main(user2, password2) {
   const { moduleTitles, requirements } = parseRequirements(REQUIREMENTS_PATH);
   let arrayTCMS = [];
   let arrayDocs = [];
+  const { csrftoken, sessionid, csrfmiddlewaretoken } = await login(
+    user2,
+    password2
+  );
   for (const requirement of requirements) {
     const parsedRequirement = JSON.stringify(requirement);
     try {
@@ -838,7 +939,6 @@ async function main() {
         DELAY_FETCH_TIME
       );
       if (response) {
-        console.log(JSON.stringify(response, null, 2));
         const responseTCMS = response?.input.testCaseTCMS;
         const responseDocs = response?.input.testCaseDoc;
         arrayTCMS = arrayTCMS.concat(responseTCMS);
@@ -849,11 +949,18 @@ async function main() {
     }
   }
   await writeFiles(arrayTCMS, arrayDocs);
-  await importTestCases(arrayTCMS, String(product_id), String(category_id));
+  await importTestCases(arrayTCMS, String(product_id), String(category_id), {
+    csrftoken,
+    sessionid,
+    csrfmiddlewaretoken
+  });
   await generateDocWithAppend(moduleTitles, arrayDocs);
 }
-if (!product_id || !category_id) {
-  console.error(MISSING_PARAMS);
+if (missingParams || missingCredentials) {
+  const messages = [];
+  if (missingParams) messages.push(MISSING_PARAMS);
+  if (missingCredentials) messages.push(MISSING_CREDENTIALS);
+  console.error(messages.join(" "));
 } else {
-  await main();
+  await main(user, password);
 }

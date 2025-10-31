@@ -34,9 +34,9 @@ export async function sendPrompt(message: string) {
       { role: "system", content: prompt },
       { role: "user", content: message },
     ],
-    /*     model: "openai/gpt-oss-20b",*/
-    model: "openai/gpt-oss-120b",
-    temperature: 1,
+    model: "openai/gpt-oss-20b",
+    /*     model: "openai/gpt-oss-120b",
+     */ temperature: 1,
     max_completion_tokens: 8192,
     top_p: 1,
     stream: false,

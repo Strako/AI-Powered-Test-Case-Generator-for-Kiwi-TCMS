@@ -1,202 +1,50 @@
 [
   {
-    "content": "Feature: Programación de horarios\nScenario: Superadministrador asigna un nuevo horario correctamente\nGiven el usuario tiene rol Superadministrador y está autenticado en el sistema\nWhen accede al módulo de programación de horarios y crea un horario válido\nThen el horario se guarda exitosamente y se muestra en la lista\nAnd se registra la acción en la bitácora de auditoría\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-001] - Superadministrador asigna horario exitosamente"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Superadministrador accede al módulo\nGiven el usuario es un Superadministrador y ha iniciado sesión\nWhen el usuario navega a la URL del módulo de programación de horarios\nThen el usuario debe ver la pantalla del módulo de asignación de horarios\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Superadministrador accede al módulo de programación de horarios"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Auxiliar administrativo crea un horario válido\nGiven el usuario tiene rol Auxiliar administrativo y está autenticado en el sistema\nWhen accede al módulo de programación de horarios y crea un horario con datos correctos\nThen el horario se guarda exitosamente y aparece en la lista de horarios\nAnd la creación se registra en la bitácora de auditoría\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-001] - Auxiliar administrativo asigna horario exitosamente"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Superadministrador asigna un nuevo horario\nGiven el usuario es un Superadministrador y tiene acceso al módulo de asignación\nWhen el usuario ingresa datos del horario (fecha, turno, empleado) y hace clic en \"Asignar\"\nThen el horario se crea correctamente y aparece en la lista de horarios\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Superadministrador asigna un nuevo horario"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Gerente de tienda aprueba un horario pendiente\nGiven el usuario tiene rol Gerente de tienda, está autenticado y existe un horario pendiente de aprobación\nWhen accede al módulo y selecciona aprobar el horario\nThen el estado del horario cambia a \"Aprobado\"\nAnd la aprobación queda registrada en la bitácora de auditoría\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-001] - Gerente de tienda aprueba horario existente"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Auxiliar administrativo accede al módulo\nGiven el usuario es Auxiliar administrativo y ha iniciado sesión\nWhen navega a la URL del módulo\nThen se muestra la pantalla del módulo con opción de asignar horarios\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Auxiliar administrativo accede al módulo de programación de horarios"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Verificación de registro en auditoría al crear horario\nGiven el usuario tiene rol Superadministrador y está autenticado\nWhen crea un nuevo horario con todos los campos obligatorios\nThen el horario se guarda y en la bitácora aparece una entrada con la acción \"Crear horario\" y el usuario responsable\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-001] - Superadministrador asigna horario y verifica auditoría"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Auxiliar administrativo asigna un nuevo horario\nGiven el usuario es Auxiliar administrativo y tiene acceso al módulo de asignación\nWhen el usuario ingresa datos del horario (fecha, turno, empleado) y hace clic en \"Asignar\"\nThen el horario se crea correctamente y aparece en la lista de horarios\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Auxiliar administrativo asigna un nuevo horario"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Registro de auditoría al crear horario por auxiliar\nGiven el usuario tiene rol Auxiliar administrativo y está autenticado\nWhen crea un horario válido\nThen el horario se guarda y la bitácora contiene una entrada con la acción \"Crear horario\" realizada por el auxiliar\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-001] - Auxiliar administrativo asigna horario y verifica auditoría"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda accede al módulo\nGiven el usuario es Gerente de tienda y ha iniciado sesión\nWhen navega a la URL del módulo\nThen se muestra la pantalla del módulo con opción de aprobar horarios\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda accede al módulo de programación de horarios"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Acceso restringido para rol no permitido\nGiven el usuario tiene rol Vendedor y está autenticado\nWhen intenta acceder al módulo de programación de horarios\nThen el sistema muestra el mensaje \"Acceso restringido\" y no permite visualizar ninguna funcionalidad\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-001] - Usuario no autorizado (Vendedor) intenta acceder al módulo"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda aprueba un horario\nGiven el usuario es Gerente de tienda y tiene un horario pendiente de aprobación\nWhen el usuario hace clic en \"Aprobar\" junto al horario\nThen el horario se marca como aprobado y el usuario recibe una confirmación\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda aprueba un horario"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Gerente de tienda no puede crear horarios\nGiven el usuario tiene rol Gerente de tienda y está autenticado\nWhen intenta crear un nuevo horario en el módulo\nThen el sistema muestra un error indicando que la acción no está autorizada para su rol\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-001] - Gerente de tienda intenta asignar horario (acción no permitida)"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Gerente de tienda intenta asignar un horario (negativo)\nGiven el usuario es Gerente de tienda y tiene acceso al módulo\nWhen intenta asignar un nuevo horario\nThen se muestra mensaje de error \"No tienes permiso para asignar horarios\" y no se crea el horario\nTipo de test case: Negativo",
+    "title": "[Programación de horarios: RH-HOR-001] - Gerente de tienda intenta asignar un horario (negativo)"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Superadministrador no tiene permiso para aprobar horarios\nGiven el usuario tiene rol Superadministrador y está autenticado\nWhen intenta aprobar un horario pendiente\nThen el sistema muestra un mensaje de error por falta de permisos y no cambia el estado del horario\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-001] - Superadministrador intenta aprobar horario (acción no permitida)"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Usuario no autorizado intenta acceder al módulo (negativo)\nGiven el usuario es Cliente y ha iniciado sesión\nWhen intenta acceder a la URL del módulo de programación de horarios\nThen se muestra mensaje de acceso restringido y se redirige a la página principal\nTipo de test case: Negativo",
+    "title": "[Programación de horarios: RH-HOR-001] - Usuario no autorizado intenta acceder al módulo (negativo)"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Validación de rango de tiempo al crear horario\nGiven el usuario tiene rol Superadministrador y está autenticado\nWhen intenta crear un horario donde la hora de inicio es idéntica a la hora de fin\nThen el sistema muestra una validación indicando que la hora de fin debe ser posterior a la hora de inicio\nTipo de test case: Edge",
-    "title": "[RH-HOR: RH-HOR-001] - Superadministrador asigna horario con hora de inicio igual a hora de fin"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Usuario no autorizado intenta asignar un horario (negativo)\nGiven el usuario es Cliente\nWhen intenta asignar un horario\nThen se muestra mensaje de acceso restringido\nTipo de test case: Negativo",
+    "title": "[Programación de horarios: RH-HOR-001] - Usuario no autorizado intenta asignar un horario (negativo)"
   },
   {
-    "content": "Feature: Programación de horarios\nScenario: Detección de conflicto de horarios superpuestos\nGiven el usuario tiene rol Auxiliar administrativo y está autenticado\nAnd ya existe un horario programado para el mismo empleado en el mismo rango horario\nWhen intenta crear un nuevo horario que se superpone con el existente\nThen el sistema muestra un mensaje de conflicto indicando que el horario se solapa con otro ya registrado\nTipo de test case: Edge",
-    "title": "[RH-HOR: RH-HOR-001] - Auxiliar administrativo asigna horario superpuesto a otro existente"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Asignación de horario registrada en auditoría (positivo)\nGiven el usuario es Superadministrador y ha asignado un horario\nWhen se verifica la bitácora de auditoría\nThen existe una entrada que registra la acción de asignación con fecha/hora y usuario\nTipo de test case: Positivo",
+    "title": "[Programación de horarios: RH-HOR-001] - Asignación de horario registrada en auditoría (positivo)"
   },
   {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Creación exitosa de asignación completa\nGiven el usuario con permiso de edición accede a la sección de asignación de colaboradores\nWhen selecciona Departamento \"Ventas\", Puesto \"Ejecutivo\", Colaborador \"Juan Pérez\" y Rol \"Operador\"\nAnd configura los horarios de la semana en la Card de eventos\nAnd visualiza los indicadores de día festivo y día con más ventas\nAnd presiona el botón \"Guardar\"\nThen la asignación se guarda correctamente y se muestra el Card de estatus de autorización con estado \"Pendiente\"\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-002] - Creación de asignación completa con datos válidos"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Intento no autorizado registrado en auditoría (edge)\nGiven el usuario es Cliente intenta acceder o asignar\nWhen se revisa bitácora de auditoría\nThen hay una entrada que registra intento de acceso no autorizado con fecha/hora\nTipo de test case: Edge",
+    "title": "[Programación de horarios: RH-HOR-001] - Intento no autorizado registrado en auditoría (edge)"
   },
   {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Creación exitosa con turno individual\nGiven el usuario con permiso de edición abre la sección y elige la opción \"Turno individual\"\nWhen selecciona fecha \"2025-11-05\" y turno \"Mañana\" para el colaborador \"Ana Gómez\"\nAnd completa los campos obligatorios de Departamento, Puesto y Rol\nAnd presiona \"Guardar\"\nThen la asignación del turno individual se guarda y el Card de estatus muestra \"Pendiente de autorización\"\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-002] - Creación de asignación con turno individual"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Copiar asignaciones de la semana anterior y guardar cambios\nGiven el usuario abre la sección y selecciona \"Copiar semana anterior\"\nWhen el sistema muestra las asignaciones de la semana previa\nAnd el usuario modifica el horario del colaborador \"Luis Martínez\" para el día martes\nAnd presiona \"Guardar\"\nThen las nuevas asignaciones se guardan y el Card de estatus indica \"Guardado exitosamente\"\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-002] - Copiar semana anterior y modificar"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Visualización correcta de indicadores en la cabecera\nGiven el usuario accede a la sección de programación semanal\nWhen la semana contiene al menos un día festivo y un día con mayor venta\nThen la cabecera muestra los indicadores de día festivo y día con más ventas correctamente\nTipo de test case: Positivo",
-    "title": "[RH-HOR: RH-HOR-002] - Visualización de indicadores de día festivo y mayor venta"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Guardar sin seleccionar Departamento\nGiven el usuario completa los campos Puesto, Colaborador y Rol pero deja vacío el selector de Departamento\nWhen presiona el botón \"Guardar\"\nThen el sistema muestra un mensaje de error \"Departamento es obligatorio\" y no guarda la asignación\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-002] - Intento de guardado sin seleccionar Departamento"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Usuario con rol solo de visualización intenta guardar cambios\nGiven un usuario con rol \"Solo lectura\" accede a la sección\nWhen intenta modificar cualquier campo y presiona \"Guardar\"\nThen el sistema muestra el mensaje \"No tiene permisos para guardar\" y la acción es rechazada\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-002] - Usuario sin permisos intenta guardar"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Rol incompatible con el puesto seleccionado\nGiven el usuario selecciona Puesto \"Supervisor\" y luego intenta asignar Rol \"Operador\"\nWhen presiona \"Guardar\"\nThen el sistema muestra el error \"El rol seleccionado no es válido para el puesto\" y no guarda la asignación\nTipo de test case: Negativo",
-    "title": "[RH-HOR: RH-HOR-002] - Selección de rol no permitido para el puesto"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Selección de departamento cuando existen 500 departamentos registrados\nGiven la base de datos contiene 500 departamentos activos\nWhen el usuario abre el selector de Departamento y elige el último registro\nAnd completa los demás campos y presiona \"Guardar\"\nThen la asignación se guarda sin errores de rendimiento y el Card de estatus muestra \"Pendiente\"\nTipo de test case: Edge",
-    "title": "[RH-HOR: RH-HOR-002] - Manejo de lista extensa de departamentos (valor límite)"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Selección de fecha anterior a la actual en turno individual\nGiven el usuario elige la opción \"Turno individual\"\nWhen intenta seleccionar la fecha \"2020-01-01\" para el turno\nThen el sistema muestra el mensaje \"La fecha seleccionada no puede ser anterior a la fecha actual\" y impide guardar\nTipo de test case: Edge",
-    "title": "[RH-HOR: RH-HOR-002] - Fecha fuera del rango permitido para turno individual"
-  },
-  {
-    "content": "Feature: Programación de horarios - Asignación de colaboradores\nScenario: Intento de crear dos asignaciones idénticas para el mismo colaborador en el mismo día\nGiven el usuario ya tiene una asignación guardada para el colaborador \"María López\" el lunes de 09:00 a 17:00\nWhen intenta crear una segunda asignación idéntica y presiona \"Guardar\"\nThen el sistema muestra el error \"Conflicto de horarios: ya existe una asignación para este colaborador en el mismo día\" y no guarda la nueva asignación\nTipo de test case: Edge",
-    "title": "[RH-HOR: RH-HOR-002] - Duplicación de asignación para mismo colaborador y día"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Crear sección de programación de horarios mostrando la semana actual\nGiven el usuario tiene acceso al módulo de programación de horarios y está autenticado\nWhen el usuario accede a la pantalla de programación y selecciona la semana actual\nThen la tabla dinámica muestra los horarios de todos los colaboradores para la semana seleccionada\nAnd los indicadores de venta aparecen con el estilo correspondiente\nTipo de test case: Positivo",
-    "title": "[RH-HOR: 003] - Crear sección de programación de horarios para semana actual"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Navegar a la semana anterior y visualizar su tabla de horarios\nGiven el usuario está en la vista de programación de horarios con una semana cargada\nWhen el usuario utiliza el selector para cambiar a la semana anterior\nThen la tabla se actualiza mostrando los horarios de la semana anterior\nAnd los totales por puesto y día se recalculan correctamente\nTipo de test case: Positivo",
-    "title": "[RH-HOR: 003] - Navegar a semana anterior y visualizar horarios"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Aplicar estilos visuales a filas con indicadores de venta alta\nGiven la tabla muestra filas con indicadores de venta alta\nWhen la tabla se renderiza\nThen las filas con venta alta aparecen con el color de fondo verde y negrita\nAnd las demás filas mantienen su estilo estándar\nTipo de test case: Positivo",
-    "title": "[RH-HOR: 003] - Aplicar estilos de venta alta en filas"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Ver totales por puesto y por día en el footer\nGiven la tabla contiene datos de horarios y ventas para cada colaborador\nWhen el usuario revisa el footer de la tabla\nThen se muestran los totales acumulados por puesto y por día\nAnd los totales coinciden con la suma de los valores mostrados en la tabla\nTipo de test case: Positivo",
-    "title": "[RH-HOR: 003] - Mostrar totales por puesto y día correctamente"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Actualizar un horario y ver reflejado sin recargar la vista\nGiven la tabla está cargada y el usuario edita un horario de un colaborador\nWhen el usuario guarda el cambio\nThen el cambio se refleja inmediatamente en la tabla y en los totales del footer\nAnd no se realiza una recarga completa de la página\nTipo de test case: Positivo",
-    "title": "[RH-HOR: 003] - Actualizar datos de horarios dinámicamente sin recarga"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Usuario sin rol de administrador intenta crear la sección\nGiven un usuario con rol de colaborador accede al módulo de programación\nWhen intenta crear la sección de programación de horarios\nThen el sistema muestra un mensaje de error de permisos insuficientes\nAnd la sección no se crea\nTipo de test case: Negativo",
-    "title": "[RH-HOR: 003] - Intentar crear sección sin permisos de administrador"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Seleccionar una semana futura fuera del rango permitido\nGiven el selector de semanas permite elegir hasta la semana actual\nWhen el usuario fuerza la selección de una semana futura (por ejemplo, semana 60)\nThen el sistema muestra un mensaje de error indicando rango inválido\nAnd no se carga ninguna tabla de horarios\nTipo de test case: Negativo",
-    "title": "[RH-HOR: 003] - Seleccionar semana fuera de rango y recibir error"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Introducir un valor no numérico en el campo de indicador de venta\nGiven la tabla permite editar el indicador de venta de una fila\nWhen el usuario ingresa texto 'ABC' en lugar de un número\nThen el sistema muestra una validación indicando que el valor debe ser numérico\nAnd el dato no se guarda\nTipo de test case: Negativo",
-    "title": "[RH-HOR: 003] - Ingresar datos de ventas no numéricos y validar error"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Visualizar la tabla para la semana 1 del año\nGiven el usuario selecciona la semana 1 en el selector\nWhen la tabla carga los datos de esa semana\nThen se muestra la tabla con horarios y totales correctos para la semana 1\nAnd los estilos dinámicos se aplican según los indicadores\nTipo de test case: Edge",
-    "title": "[RH-HOR: 003] - Crear sección con semana mínima del año (semana 1)"
-  },
-  {
-    "content": "Feature: Programación de horarios por semana\nScenario: Visualizar la tabla para la semana 52 del año\nGiven el usuario selecciona la semana 52 en el selector\nWhen la tabla carga los datos de esa semana\nThen la tabla muestra los horarios y los totales por puesto y día son correctos\nAnd el footer comparativo muestra la diferencia vs cuadro base\nTipo de test case: Edge",
-    "title": "[RH-HOR: 003] - Crear sección con semana máxima del año (semana 52) y totales correctos"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Acceso exitoso de Superadministrador al módulo\nGiven el usuario está autenticado con el rol Superadministrador\nWhen intenta acceder al módulo de gestión de cuadro base\nThen el sistema muestra la interfaz del módulo\nAnd se registra el intento de acceso en la bitácora\nTipo de test case: Positivo",
-    "title": "[RH-CB: 001] - Acceso exitoso de Superadministrador al módulo"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Acceso exitoso de Capital humano al módulo\nGiven el usuario está autenticado con el rol Capital humano\nWhen intenta acceder al módulo de gestión de cuadro base\nThen el sistema muestra la interfaz del módulo\nAnd se registra el intento de acceso en la bitácora\nTipo de test case: Positivo",
-    "title": "[RH-CB: 001] - Acceso exitoso de Capital humano al módulo"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Visualización del módulo en la interfaz para Superadministrador\nGiven el usuario Superadministrador ha iniciado sesión\nWhen navega al menú principal\nThen el módulo de gestión de cuadro base está visible en el menú\nAnd el usuario puede hacer clic para ingresar\nTipo de test case: Positivo",
-    "title": "[RH-CB: 001] - Visualización del módulo en la interfaz para Superadministrador"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Creación de registro en módulo por Capital humano\nGiven el usuario Capital humano tiene acceso al módulo\nWhen crea un nuevo registro en el módulo\nThen el registro se guarda correctamente\nAnd se genera un registro de auditoría del evento\nTipo de test case: Positivo",
-    "title": "[RH-CB: 001] - Creación de registro en módulo por Capital humano"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Auditoría registra acceso exitoso de Superadministrador\nGiven el usuario Superadministrador accede al módulo\nWhen la solicitud es procesada por el backend\nThen el log de auditoría contiene una entrada con usuario y timestamp\nTipo de test case: Positivo",
-    "title": "[RH-CB: 001] - Auditoría registra acceso exitoso de Superadministrador"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Acceso denegado a usuario con rol Gerente\nGiven el usuario está autenticado con el rol Gerente\nWhen intenta acceder al módulo de gestión de cuadro base\nThen el sistema muestra el mensaje \"Acceso restringido\"\nAnd el módulo no es visible en la interfaz\nTipo de test case: Negativo",
-    "title": "[RH-CB: 001] - Acceso denegado a usuario con rol Gerente"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: API rechaza acceso a rol Empleado con código 403\nGiven el usuario está autenticado con el rol Empleado\nWhen envía una petición GET al endpoint /cuadro-base\nThen la respuesta HTTP tiene código 403 Forbidden\nAnd el cuerpo contiene el mensaje de acceso restringido\nTipo de test case: Negativo",
-    "title": "[RH-CB: 001] - API rechaza acceso a rol Empleado con código 403"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Mensaje de acceso restringido mostrado al rol no autorizado\nGiven el usuario con rol Operador intenta abrir el módulo desde la URL directa\nWhen la solicitud es procesada por el frontend\nThen se muestra el mensaje \"Acceso restringido\" en pantalla\nAnd no se carga ninguna información del módulo\nTipo de test case: Negativo",
-    "title": "[RH-CB: 001] - Mensaje de acceso restringido mostrado al rol no autorizado"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Acceso denegado cuando token está expirado\nGiven el usuario tiene un token de sesión expirado\nWhen intenta acceder al módulo\nThen el sistema redirige al login y muestra mensaje \"Sesión expirada\"\nAnd no se registra acceso en auditoría\nTipo de test case: Edge",
-    "title": "[RH-CB: 001] - Acceso denegado cuando token está expirado"
-  },
-  {
-    "content": "Feature: Gestión cuadro base - Control de acceso por rol\nScenario: Acceso denegado sin token (usuario no autenticado)\nGiven el usuario no está autenticado\nWhen intenta acceder al módulo\nThen se muestra el mensaje \"Acceso restringido\"\nAnd se redirige a la página de inicio de sesión\nTipo de test case: Edge",
-    "title": "[RH-CB: 001] - Acceso denegado sin token (usuario no autenticado)"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Creación exitosa del módulo con datos válidos\nGiven el usuario ha iniciado sesión con rol de edición y está en la pantalla de Gestión cuadro base\nWhen selecciona un departamento válido, se cargan los datos del cuadro base y presiona el botón \"Guardar cambios\"\nThen el sistema guarda los cambios, actualiza la tabla inmediatamente y muestra el mensaje de confirmación \"Cambios guardados exitosamente\"\nAnd el botón \"Guardar cambios\" se deshabilita hasta nuevas modificaciones\nTipo de test case: Positivo",
-    "title": "RH-CB: 002 - Creación exitosa del módulo con datos válidos"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Visualización del histórico del cuadro base\nGiven el usuario está en la pantalla de Gestión cuadro base y existen versiones históricas del cuadro base\nWhen presiona el botón \"Ver histórico\"\nThen el sistema muestra una ventana/modal con la lista de versiones anteriores\nAnd al seleccionar una versión, se muestra su contenido en modo solo lectura\nTipo de test case: Positivo",
-    "title": "RH-CB: 002 - Visualización del histórico del cuadro base"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Filtrado por departamento muestra datos correctos\nGiven el usuario ha seleccionado el departamento \"Recursos Humanos\"\nWhen el sistema carga la tabla correspondiente\nThen la tabla muestra únicamente los registros pertenecientes al departamento seleccionado\nAnd los botones \"Guardar cambios\" y \"Ver histórico\" están habilitados solo si existen datos válidos\nTipo de test case: Positivo",
-    "title": "RH-CB: 002 - Filtrado por departamento muestra datos correctos"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Intento de guardar sin cambios muestra mensaje apropiado\nGiven el usuario ha cargado datos del cuadro base y no ha realizado modificaciones\nWhen presiona el botón \"Guardar cambios\"\nThen el sistema muestra el mensaje \"No se detectaron cambios para guardar\"\nAnd no se realizan operaciones de persistencia\nTipo de test case: Positivo",
-    "title": "RH-CB: 002 - Intento de guardar sin cambios muestra mensaje apropiado"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Botón Guardar deshabilitado sin seleccionar departamento\nGiven el usuario está en la pantalla de Gestión cuadro base sin haber seleccionado ningún departamento\nWhen observa el botón \"Guardar cambios\"\nThen el botón está deshabilitado y no permite la acción\nTipo de test case: Negativo",
-    "title": "RH-CB: 002 - Botón Guardar deshabilitado sin seleccionar departamento"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Botón Guardar deshabilitado con datos inválidos\nGiven el usuario ha seleccionado un departamento y la tabla contiene un registro con campo obligatorio vacío\nWhen intenta presionar el botón \"Guardar cambios\"\nThen el botón está deshabilitado y el sistema muestra una alerta \"Existen datos inválidos\"\nTipo de test case: Negativo",
-    "title": "RH-CB: 002 - Botón Guardar deshabilitado con datos inválidos"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Usuario sin permiso no puede guardar cambios\nGiven el usuario ha iniciado sesión con rol de solo lectura\nWhen intenta presionar el botón \"Guardar cambios\"\nThen el sistema muestra un mensaje de error \"Permiso insuficiente para guardar cambios\"\nAnd la acción no se ejecuta\nTipo de test case: Negativo",
-    "title": "RH-CB: 002 - Usuario sin permiso no puede guardar cambios"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Carga de tabla con gran cantidad de registros\nGiven el usuario selecciona el departamento \"Ventas\" que contiene el número máximo de registros permitidos (10,000)\nWhen el sistema carga la tabla\nThen la tabla muestra todos los registros sin truncar y el tiempo de carga es menor a 5 segundos\nTipo de test case: Edge",
-    "title": "RH-CB: 002 - Carga de tabla con gran cantidad de registros"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Filtrado de departamento sin registros muestra mensaje vacío\nGiven el usuario selecciona el departamento \"Investigación\" que no tiene registros asociados\nWhen el sistema intenta cargar la tabla\nThen se muestra el mensaje \"No hay datos disponibles para el departamento seleccionado\"\nAnd la tabla permanece vacía\nTipo de test case: Edge",
-    "title": "RH-CB: 002 - Filtrado de departamento sin registros muestra mensaje vacío"
-  },
-  {
-    "content": "Feature: Gestión cuadro base\nScenario: Visualizar histórico de versión no disponible muestra error\nGiven el usuario abre el historial y selecciona una versión anterior que ha sido eliminada por política de retención\nWhen intenta visualizar esa versión\nThen el sistema muestra el mensaje de error \"Histórico no disponible para la versión seleccionada\"\nTipo de test case: Edge",
-    "title": "RH-CB: 002 - Visualizar histórico de versión no disponible muestra error"
+    "content": "Feature: Módulo de programación de horarios por rol\nScenario: Asignación de horario con datos faltantes (edge)\nGiven el usuario es Auxiliar administrativo\nWhen intenta asignar horario sin indicar el empleado\nThen se muestra mensaje de error \"Campo empleado obligatorio\" y no se crea el horario\nTipo de test case: Edge",
+    "title": "[Programación de horarios: RH-HOR-001] - Asignación de horario con datos faltantes (edge)"
   }
 ]
