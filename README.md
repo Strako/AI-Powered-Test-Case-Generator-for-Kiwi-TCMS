@@ -438,9 +438,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 - 🐳 [Docker Installation Guide](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html)
 - 🔌 [API Documentation](https://kiwitcms.readthedocs.io/en/latest/api/index.html)
 
-## Output Files
+## Test cases objects and Output file
 
-### 1. testcases.json
+### 1. TCMS test cases object
 
 **Format:** TCMS-ready test cases
 
@@ -461,7 +461,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 ]
 ```
 
-### 2. data.json
+### 2. Word test cases object
 
 **Format:** Documentation-ready test cases
 
