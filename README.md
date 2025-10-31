@@ -1,204 +1,531 @@
-# AI-Powered Test Case Generator
+# AI-Powered Test Case Generator for Kiwi TCMS
 
 ## Table of Contents
 
 1. [Overview](#overview)
 2. [Key Features](#key-features)
 3. [Architecture](#architecture)
-4. [Project Structure](#project-structure)
-5. [Installation](#installation)
-6. [Configuration](#configuration)
-7. [Usage](#usage)
-8. [Input Requirements](#input-requirements)
-9. [AI Integration](#ai-integration)
-10. [Output Formats](#output-formats)
-11. [Document Generation](#document-generation)
-12. [Development](#development)
-13. [Scripts](#scripts)
-14. [Dependencies](#dependencies)
-15. [Contributing](#contributing)
+4. [Prerequisites](#prerequisites)
+5. [Project Structure](#project-structure)
+6. [Installation](#installation)
+7. [Environment Configuration](#environment-configuration)
+8. [Template Files](#template-files)
+9. [Usage](#usage)
+10. [Kiwi TCMS Integration](#kiwi-tcms-integration)
+11. [Output Files](#output-files)
+12. [AI Integration Details](#ai-integration-details)
+13. [Document Generation](#document-generation)
+14. [Development](#development)
+15. [Scripts](#scripts)
+16. [Troubleshooting](#troubleshooting)
+17. [Contributing](#contributing)
+18. [License](#license)
 
 ## Overview
 
-An intelligent TypeScript application that leverages AI to automatically generate comprehensive test cases from Excel requirements. The system uses **Groq AI** to analyze requirements and produce structured test cases in Gherkin format, supporting both TCMS integration and professional Word document generation.
+An intelligent TypeScript application that leverages **Groq AI** to automatically generate comprehensive test cases from Excel requirements and seamlessly integrates with **Kiwi TCMS** (Test Case Management System). The system analyzes business requirements and produces structured test cases in Gherkin format, supporting both TCMS integration and professional Word document generation.
 
-This tool is specifically designed for QA Engineers working in agile environments who need to rapidly convert business requirements into executable test cases with complete coverage.
+**What it does:**
+
+- Reads requirements from Excel files
+- Uses AI to generate comprehensive test cases (Happy Path, Edge Cases, Negative scenarios)
+- Automatically uploads test cases to Kiwi TCMS
+- Generates professional Word documents with formatted test case tables
+- Exports JSON files for further processing
+
+**Target Users:** QA Engineers, Test Managers, and QA Teams working in agile environments who need to rapidly convert business requirements into executable test cases.
 
 ## Key Features
 
-- **🤖 AI-Powered Generation**: Uses Groq AI (GPT-OSS-20B) to intelligently create test cases from requirements
-- **📊 Excel Integration**: Reads requirements directly from Excel files with structured parsing
-- **🥒 Gherkin Format**: Generates BDD-style test cases with Given/When/Then structure
-- **📝 Dual Output**: Creates both TCMS-ready and documentation-ready formats
-- **📄 Documentation**: Generates formatted Word documents with tables and styling
-- **🔄 Document Merging**: Combines new test cases with existing documentation
-- **🛠️ TCMS Integration**: Direct upload capability to Test Case Management Systems
-- **🎯 Comprehensive Coverage**: Ensures Happy Path, Edge Cases, and Negative scenarios
-- **🌐 Spanish Language Support**: All generated content in Spanish for localized teams
+- 🤖 **AI-Powered Generation**: Uses Groq AI (GPT-OSS-20B) with specialized QA prompts
+- 📊 **Excel Integration**: Parses structured requirements from Excel files
+- 🥒 **Gherkin Format**: BDD-style test cases (Given/When/Then)
+- 🔄 **Kiwi TCMS Integration**: Automatic authentication and test case upload
+- 📝 **Dual Output**: TCMS-ready and documentation-ready formats
+- 📄 **Professional Documentation**: Formatted Word documents with tables
+- 🔐 **Secure Authentication**: Handles CSRF tokens and session management
+- 🎯 **Comprehensive Coverage**: Minimum 10 test cases per requirement
+- 🌐 **Spanish Language Support**: All content generated in Spanish
+- ♻️ **Retry Mechanism**: Automatic retry with exponential backoff
+- 📦 **JSON Export**: Saves test cases in structured JSON format
 
 ## Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Excel File    │───▶│   AI Processor  │───▶│  Test Cases     │
-│ (Requirements)  │    │   (Groq API)    │    │ (Gherkin Format)│
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   TCMS Upload   │◀───│   Dual Output   │───▶│  Word Document  │
-│   (HTTP API)    │    │   Generator     │    │ (Documentation) │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
+┌──────────────────┐
+│  requirements.   │
+│     xlsx         │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐     ┌──────────────────┐
+│  Excel Parser    │────▶│   Groq AI API    │
+│  (XLSX Reader)   │     │  (GPT-OSS-20B)   │
+└──────────────────┘     └────────┬─────────┘
+                                  │
+                                  ▼
+                         ┌──────────────────┐
+                         │  Test Cases      │
+                         │  (Gherkin)       │
+                         └────────┬─────────┘
+                                  │
+                    ┌─────────────┴─────────────┐
+                    ▼                           ▼
+         ┌──────────────────┐        ┌──────────────────┐
+         │  Kiwi TCMS       │        │  Word Document   │
+         │  (HTTP Upload)   │        │  Generator       │
+         └──────────────────┘        └──────────────────┘
+                    │                           │
+                    ▼                           ▼
+         ┌──────────────────┐        ┌──────────────────┐
+         │  testcases.json  │        │ final_document.  │
+         │  data.json       │        │     docx         │
+         └──────────────────┘        └──────────────────┘
 ```
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+### Required Software
+
+| Software           | Version | Purpose                            | Installation Link                                                                          |
+| ------------------ | ------- | ---------------------------------- | ------------------------------------------------------------------------------------------ |
+| **Node.js**        | ≥ 18.x  | JavaScript runtime                 | [Download Node.js](https://nodejs.org/)                                                    |
+| **npm**            | ≥ 9.x   | Package manager                    | Included with Node.js                                                                      |
+| **Kiwi TCMS**      | Latest  | Test Case Management System        | [Kiwi TCMS Docker Guide](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html) |
+| **Docker**         | Latest  | Container platform (for Kiwi TCMS) | [Get Docker](https://docs.docker.com/get-docker/)                                          |
+| **Docker Compose** | Latest  | Multi-container orchestration      | [Install Docker Compose](https://docs.docker.com/compose/install/)                         |
+
+### Kiwi TCMS Setup
+
+👉 **Official Installation Guide**: [Kiwi TCMS Docker Installation](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html)
+
+**Quick Setup:**
+
+```bash
+# Clone Kiwi TCMS
+git clone https://github.com/kiwitcms/Kiwi.git
+cd Kiwi
+
+# Start Kiwi TCMS with Docker Compose
+docker-compose up -d
+
+# Access Kiwi TCMS at https://localhost
+# Default credentials: admin / admin (change immediately!)
+```
+
+### API Requirements
+
+- **Groq API Key**: Sign up at [Groq Console](https://console.groq.com/) to get your API key
 
 ## Project Structure
 
 ```
+generate-testcases-and-docs/
 ├── src/
 │   ├── common/
 │   │   ├── utils/
 │   │   │   ├── doc-utils.ts         # Word document generation
-│   │   │   ├── groq-utils.ts        # AI integration with Groq
-│   │   │   ├── import-test-cases.ts # TCMS upload functionality
-│   │   │   ├── read-requirements.ts # Excel parsing utilities
-│   │   │   └── utils.ts             # General utilities
+│   │   │   ├── groq-utls.ts         # AI integration with Groq
+│   │   │   ├── import-test-cases.ts # Kiwi TCMS upload
+│   │   │   ├── read-requirements.ts # Excel parsing
+│   │   │   └── utils.ts             # Login & utilities
 │   │   ├── constants.ts             # Application constants
-│   │   └── types.ts                 # TypeScript type definitions
+│   │   └── types.ts                 # TypeScript definitions
 │   ├── data/
 │   │   ├── data.ts                  # Sample test case data
 │   │   ├── prompts.ts               # AI prompt templates
-│   │   └── testcases.ts             # Static test case examples
-│   └── index.ts                     # Main application entry point
-├── requirements.xlsx                # Input requirements file
-├── template_requirements_example.xlsx # Template for requirements
-├── original.docx                   # Base document for merging
-├── final_document.docx             # Generated output document
-├── .env                           # Environment variables (API keys)
-├── package.json                   # Dependencies and scripts
-└── tsconfig.json                  # TypeScript configuration
+│   │   └── testcases.ts             # Static examples
+│   └── index.ts                     # Main entry point
+├── requirements.xlsx                # INPUT: Your requirements
+├── template_requirements_example.xlsx # Template reference
+├── original.docx                   # Optional: Base document
+├── final_document.docx             # OUTPUT: Generated docs
+├── testcases.json                  # OUTPUT: TCMS format
+├── data.json                       # OUTPUT: Doc format
+├── .env                           # Environment variables
+├── .env.example                   # Environment template
+├── package.json                   # Dependencies
+├── tsconfig.json                  # TypeScript config
+└── README.md                      # This file
 ```
 
 ## Installation
 
-1. **Clone the repository**:
+### Step 1: Clone the Repository
 
-   ```bash
-   git clone https://github.com/Strako/Generate-testcases-and-docs.git
-   cd Generate-testcases-and-docs
-   ```
+```bash
+git clone https://github.com/Strako/Generate-testcases-and-docs.git
+cd Generate-testcases-and-docs
+```
 
-2. **Install dependencies**:
+### Step 2: Install Dependencies
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
-3. **Set up environment variables**:
+### Step 3: Build the Project
 
-   ```bash
-   cp .env.example .env
-   # Edit .env and add your Groq API key
-   ```
+```bash
+npm run build
+```
 
-4. **Build the project**:
-   ```bash
-   npm run build
-   ```
+This compiles TypeScript to JavaScript and creates `index.js`.
 
-## Configuration
+## Environment Configuration
+
+### Create .env File
+
+Create a `.env` file in the project root:
+
+```bash
+cp .env.example .env
+```
 
 ### Environment Variables
 
-Create a `.env` file with your Groq API credentials:
+Edit `.env` with your configuration:
 
 ```env
-GROQ_API_KEY=your_groq_api_key_here
+# ============================================
+# GROQ AI CONFIGURATION
+# ============================================
+# Your Groq API key from https://console.groq.com/
+GROQ_API_KEY=gsk_your_actual_groq_api_key_here
+
+# ============================================
+# KIWI TCMS CONFIGURATION
+# ============================================
+# Kiwi TCMS username (default: admin)
+TCMS_USER=admin
+
+# Kiwi TCMS password (change from default!)
+TCMS_PASSWORD=your_secure_password
+
+# Default tester username for test case assignment
+DEFAULT_TESTER=admin
 ```
 
-### Requirements File
+### Variable Descriptions
 
-Place your requirements in `requirements.xlsx` following this structure:
+| Variable         | Required | Default | Description                                         |
+| ---------------- | -------- | ------- | --------------------------------------------------- |
+| `GROQ_API_KEY`   | ✅ Yes   | -       | API key from Groq Console for AI generation         |
+| `TCMS_USER`      | ✅ Yes   | -       | Kiwi TCMS username for authentication               |
+| `TCMS_PASSWORD`  | ✅ Yes   | -       | Kiwi TCMS password for authentication               |
+| `DEFAULT_TESTER` | ✅ Yes   | -       | Username to assign as default tester for test cases |
 
-| Módulo          | Descripción            | ID Requerimiento | Requerimiento                        | Consideración             |
-| --------------- | ---------------------- | ---------------- | ------------------------------------ | ------------------------- |
-| User Management | User registration flow | REQ-001          | Users must register with valid email | Email validation required |
+### Security Notes
 
-### Command Line Arguments
+⚠️ **Important:**
 
-The application supports command line arguments for TCMS integration:
+- Never commit `.env` to version control (already in `.gitignore`)
+- Change default Kiwi TCMS credentials immediately after installation
+- Use strong passwords for production environments
+- Rotate API keys regularly
 
-```bash
-npm start -- --product=1 --category=2
+## Template Files
+
+### 1. Requirements Excel File
+
+**Filename:** `requirements.xlsx`
+
+**Location:** Project root directory
+
+**Purpose:** Contains business requirements that will be converted to test cases
+
+**Structure:**
+
+| Column               | Type   | Required | Description                                   | Example                       |
+| -------------------- | ------ | -------- | --------------------------------------------- | ----------------------------- |
+| **Módulo**           | String | Yes      | Module/feature name (creates section headers) | "Gestión de Usuarios"         |
+| **Descripción**      | String | Yes      | Brief functionality description               | "Registro de nuevos usuarios" |
+| **ID Requerimiento** | String | Yes      | Unique requirement identifier                 | "REQ-001"                     |
+| **Requerimiento**    | String | Yes      | Detailed requirement description              | "El sistema debe permitir..." |
+| **Consideración**    | String | Optional | Additional constraints or notes               | "Validar formato de email"    |
+
+**Example Content:**
+
+```
+| Módulo              | Descripción                  | ID Requerimiento | Requerimiento                                      | Consideración                    |
+|---------------------|------------------------------|------------------|----------------------------------------------------|----------------------------------|
+| Gestión de Usuarios | Registro de nuevos usuarios  | REQ-001          | El sistema debe permitir el registro con email     | Validar formato y unicidad       |
+| Gestión de Usuarios | Login de usuarios            | REQ-002          | El sistema debe autenticar usuarios con credenciales| Máximo 3 intentos fallidos      |
+| Gestión de Productos| Crear nuevo producto         | REQ-003          | Permitir crear productos con nombre y precio       | Precio debe ser mayor a 0        |
+```
+
+**Template File:** Use `template_requirements_example.xlsx` as a reference
+
+### 2. Original Document (Optional)
+
+**Filename:** `original.docx`
+
+**Location:** Project root directory
+
+**Purpose:** Base Word document to merge new test cases into
+
+**When to use:**
+
+- You have existing documentation you want to append to
+- You want to maintain consistent formatting across documents
+- You're adding test cases to an existing test plan
+
+**If not present:**
+
+- System creates a new document from scratch
+- No merging occurs, only new content is generated
+
+### 3. Environment Template
+
+**Filename:** `.env.example`
+
+**Location:** Project root directory
+
+**Purpose:** Template for environment variables
+
+**Content:**
+
+```env
+# Groq AI API Key
+GROQ_API_KEY=your_groq_api_key_here
+
+# Kiwi TCMS Credentials
+TCMS_USER=admin
+TCMS_PASSWORD=your_password
+DEFAULT_TESTER=admin
 ```
 
 ## Usage
 
 ### Basic Execution
 
-Run the complete workflow:
+Run the complete workflow with required parameters:
 
 ```bash
-npm start
+npm start -- --product=1 --category=1
 ```
 
-This will:
+**Parameters:**
 
-1. Parse requirements from `requirements.xlsx`
-2. Send each requirement to Groq AI for test case generation
-3. Process AI responses and extract structured test cases
-4. Generate Word documentation (when enabled)
-5. Upload to TCMS (when configured)
+- `--product=<id>`: Product ID in Kiwi TCMS (required)
+- `--category=<id>`: Category ID in Kiwi TCMS (required)
+
+### What Happens When You Run
+
+1. ✅ **Validates** environment variables and parameters
+2. 🔐 **Authenticates** with Kiwi TCMS (obtains session tokens)
+3. 📖 **Parses** `requirements.xlsx` file
+4. 🤖 **Sends** each requirement to Groq AI for test case generation
+5. 📝 **Processes** AI responses and extracts structured test cases
+6. 💾 **Saves** JSON files (`testcases.json`, `data.json`)
+7. ⬆️ **Uploads** test cases to Kiwi TCMS
+8. 📄 **Generates** Word document (`final_document.docx`)
 
 ### Development Mode
 
-For development with auto-rebuild:
+For development with auto-rebuild on file changes:
 
 ```bash
 npm run watch
 ```
 
-### Custom Requirements File
+This watches for TypeScript changes and automatically rebuilds.
 
-Specify a different requirements file:
+### Finding Product and Category IDs
+
+**In Kiwi TCMS:**
+
+1. Navigate to **Management** → **Products**
+2. Click on your product
+3. Check the URL: `https://localhost/admin/management/product/<ID>/change/`
+4. The number is your Product ID
+
+For Category ID:
+
+1. Go to **Management** → **Categories**
+2. Click on your category
+3. Check the URL for the Category ID
+
+### Example Commands
 
 ```bash
-# Modify REQUIREMENTS_PATH in src/common/constants.ts
-export const REQUIREMENTS_PATH = "./custom-requirements.xlsx";
+# Standard execution
+npm start -- --product=1 --category=2
+
+# Different product/category
+npm start -- --product=5 --category=3
+
+# Build before running
+npm run build && npm start -- --product=1 --category=1
 ```
 
-## Input Requirements
+## Kiwi TCMS Integration
 
-### Excel File Format
+### Overview
 
-The system expects an Excel file with the following columns:
+The application integrates with Kiwi TCMS through HTTP API calls, handling authentication, session management, and test case creation automatically.
 
-- **Módulo**: Module or feature name (creates section headers)
-- **Descripción**: Brief description of the functionality
-- **ID Requerimiento**: Unique requirement identifier
-- **Requerimiento**: Detailed requirement description
-- **Consideración**: Additional considerations or constraints
-
-### Example Requirement
+### Authentication Flow
 
 ```
-Módulo: Gestión de Usuarios
-Descripción: Registro de nuevos usuarios
-ID Requerimiento: REQ-001
-Requerimiento: El sistema debe permitir el registro de usuarios con email válido
-Consideración: Validar formato de email y unicidad
+1. GET /accounts/login/
+   └─> Extract CSRF token from HTML
+
+2. POST /accounts/login/
+   └─> Submit credentials
+   └─> Receive session cookies (csrftoken, sessionid)
+
+3. GET /cases/new/
+   └─> Extract updated CSRF middleware token
+
+4. POST /cases/new/ (for each test case)
+   └─> Create test case with all tokens
 ```
 
-## AI Integration
+### Connection Details
+
+**Base URL:** `https://localhost` (default Kiwi TCMS Docker setup)
+
+**Endpoints Used:**
+
+- `/accounts/login/` - Authentication
+- `/cases/new/` - Test case creation
+
+**Authentication Method:**
+
+- Form-based login with CSRF protection
+- Session cookies (csrftoken, sessionid)
+- CSRF middleware token for POST requests
+
+### Test Case Upload
+
+Each test case is uploaded with:
+
+```typescript
+{
+  summary: "[REQ-001] - Test case title",
+  text: "Feature: ...\nScenario: ...\nGiven: ...",
+  product: "1",
+  category: "1",
+  default_tester: "admin",
+  case_status: "2",  // Confirmed
+  priority: "1",     // High
+  author: "2"        // System user
+}
+```
+
+### SSL Configuration
+
+⚠️ **Development Only:**
+
+The application disables SSL verification for local development:
+
+```typescript
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+```
+
+**For Production:**
+
+- Remove this setting
+- Use valid SSL certificates
+- Configure proper HTTPS
+
+### Kiwi TCMS Resources
+
+- 📚 [Official Documentation](https://kiwitcms.readthedocs.io/)
+- 🐳 [Docker Installation Guide](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html)
+- 🔌 [API Documentation](https://kiwitcms.readthedocs.io/en/latest/api/index.html)
+- 💬 [Community Support](https://github.com/kiwitcms/Kiwi/discussions)
+
+## Output Files
+
+### 1. testcases.json
+
+**Format:** TCMS-ready test cases
+
+**Purpose:** Direct upload to Kiwi TCMS
+
+**Structure:**
+
+```json
+[
+  {
+    "title": "[REQ-001] - Registrar usuario con email válido",
+    "content": "Feature: Registro de usuarios\nScenario: Registro exitoso con datos válidos\nGiven: El usuario tiene un email válido\nWhen: Envía el formulario de registro\nThen: El sistema crea la cuenta exitosamente\nAnd: Envía email de confirmación\nTipo de test case: Happy Path"
+  },
+  {
+    "title": "[REQ-001] - Error al registrar con email inválido",
+    "content": "Feature: Registro de usuarios\nScenario: Intento de registro con email inválido\nGiven: El usuario ingresa un email con formato inválido\nWhen: Envía el formulario de registro\nThen: El sistema rechaza el registro\nAnd: Muestra mensaje de error\nTipo de test case: Validación Negativa"
+  }
+]
+```
+
+### 2. data.json
+
+**Format:** Documentation-ready test cases
+
+**Purpose:** Word document generation
+
+**Structure:**
+
+```json
+[
+  {
+    "title": "[REQ-001] - Registrar usuario con email válido",
+    "description": "Feature: Registro de usuarios\nScenario: Registro exitoso con datos válidos",
+    "test_case": "Given: El usuario tiene un email válido\nWhen: Envía el formulario de registro\nThen: El sistema crea la cuenta exitosamente\nAnd: Envía email de confirmación",
+    "test_type": "Happy Path",
+    "isFirst": true
+  },
+  {
+    "title": "[REQ-001] - Error al registrar con email inválido",
+    "description": "Feature: Registro de usuarios\nScenario: Intento de registro con email inválido",
+    "test_case": "Given: El usuario ingresa un email con formato inválido\nWhen: Envía el formulario de registro\nThen: El sistema rechaza el registro\nAnd: Muestra mensaje de error",
+    "test_type": "Validación Negativa",
+    "isFirst": false
+  }
+]
+```
+
+### 3. final_document.docx
+
+**Format:** Microsoft Word document
+
+**Purpose:** Professional test case documentation
+
+**Features:**
+
+- Formatted tables with blue headers
+- Sequential test case IDs
+- Module-based sections with headings
+- Professional styling
+
+**Table Structure:**
+
+| Field          | Content                                     |
+| -------------- | ------------------------------------------- |
+| **ID – 1228**  | Blue header with white text                 |
+| Título         | Test case title with requirement prefix     |
+| Descripción    | Feature and scenario description            |
+| Caso de prueba | Gherkin steps (Given/When/Then/And)         |
+| Tipo de test   | Test category (Happy Path, Edge Case, etc.) |
+
+## AI Integration Details
 
 ### Groq AI Configuration
 
-The system uses Groq's GPT-OSS-20B model with the following settings:
+**Model:** `openai/gpt-oss-20b`
+
+**Settings:**
 
 ```typescript
 {
   model: "openai/gpt-oss-20b",
   temperature: 1,
   max_completion_tokens: 8192,
+  top_p: 1,
   reasoning_effort: "medium",
   tool_choice: "auto"
 }
@@ -206,158 +533,565 @@ The system uses Groq's GPT-OSS-20B model with the following settings:
 
 ### AI Prompt Engineering
 
-The AI is configured with a specialized QA Engineer profile that:
+The system uses a specialized QA Engineer profile that:
 
-- Generates test cases exclusively in Spanish
-- Follows Gherkin BDD format (Given/When/Then)
-- Creates comprehensive coverage (Happy Path + Edge Cases + Negative scenarios)
-- Produces dual output formats for different use cases
-- Ensures minimum 10 test cases per requirement for thorough coverage
+✅ **Language:** All outputs in Spanish
+✅ **Format:** Gherkin BDD (Given/When/Then)
+✅ **Coverage:** Happy Path + Edge Cases + Negative scenarios
+✅ **Minimum:** 10 test cases per requirement
+✅ **Structure:** Dual JSON output (TCMS + Documentation)
+
+### Prompt Structure
+
+```
+Role: Quality Assurance Engineer
+Task: Generate comprehensive test cases in Gherkin format
+Input: Business requirement (JSON)
+Output: Structured test cases via function calling
+
+Requirements:
+- Use Spanish for all content
+- Follow Gherkin keywords (Given/When/Then/And)
+- Generate minimum 10 test cases
+- Cover all scenarios (positive, negative, edge cases)
+- Use tool "saveTestCases" to return structured data
+```
 
 ### Retry Mechanism
 
-Built-in retry logic with exponential backoff:
+**Configuration:**
 
-- **Default retries**: 3 attempts
-- **Delay**: 2000ms between attempts
-- **Error handling**: Detailed logging and graceful degradation
+- **Retries:** 3 attempts
+- **Delay:** 1000ms between attempts
+- **Backoff:** Linear delay
+- **Error Handling:** Detailed logging and graceful exit
 
-## Output Formats
+**Flow:**
 
-### Format 1: TCMS Integration
-
-```json
-[
-  {
-    "title": "[REQ-001] - Registrar usuario con email válido",
-    "content": "Feature: Registro de usuarios\nScenario: Registro exitoso\nGiven: Usuario con datos válidos\nWhen: Envía formulario de registro\nThen: Usuario se registra exitosamente\nTipo de test case: Happy Path"
-  }
-]
+```
+Attempt 1 → Success ✅
+         ↓ Failure
+Attempt 2 (wait 1s) → Success ✅
+                   ↓ Failure
+Attempt 3 (wait 1s) → Success ✅
+                   ↓ Failure
+Exit with error ❌
 ```
 
-### Format 2: Documentation
+### Function Calling
 
-```json
-[
-  {
-    "title": "[REQ-001] - Registrar usuario con email válido",
-    "description": "Feature: Registro de usuarios\nScenario: Registro exitoso",
-    "test_case": "Given: Usuario con datos válidos\nWhen: Envía formulario de registro\nThen: Usuario se registra exitosamente",
-    "test_type": "Happy Path",
-    "isFirst": true
-  }
-]
+The AI uses structured function calling to return data:
+
+**Function:** `saveTestCases`
+
+**Parameters:**
+
+```typescript
+{
+  testCaseDoc: TestCaseDoc[],  // For documentation
+  testCaseTCMS: TestCaseTCMS[] // For TCMS upload
+}
 ```
 
 ## Document Generation
 
 ### Word Document Features
 
-- **Professional Styling**: Blue headers with white text
-- **Structured Tables**: Each test case in a formatted table
-- **Sequential Numbering**: Auto-incrementing test case IDs
-- **Section Organization**: Module-based grouping with headings
-- **Merge Capability**: Combines with existing documentation
+- **Professional Styling:** Blue headers (#0E4CB2) with white text
+- **Structured Tables:** Each test case in formatted table
+- **Sequential Numbering:** Auto-incrementing IDs (starts at 1228)
+- **Section Organization:** Module-based grouping with H1 headings
+- **Merge Capability:** Combines with existing `original.docx`
+- **Page Breaks:** Automatic page breaks between sections
 
-### Document Structure
+### Document Merging Process
 
-Each test case table includes:
+1. **Check for original.docx**
+   - If exists: Merge mode
+   - If not: Create new document
 
-| Field              | Description                                 |
-| ------------------ | ------------------------------------------- |
-| **ID**             | Sequential identifier with blue header      |
-| **Título**         | Test case title with requirement prefix     |
-| **Descripción**    | Feature and scenario description            |
-| **Caso de prueba** | Gherkin steps (Given/When/Then)             |
-| **Tipo de test**   | Test category (Happy Path, Edge Case, etc.) |
+2. **Generate new content**
+   - Create tables for each test case
+   - Add module headings
+
+3. **Merge documents** (if original exists)
+   - Extract XML from both documents
+   - Insert page break
+   - Combine content
+   - Preserve formatting
+
+4. **Save output**
+   - Write to `final_document.docx`
+
+### Customization
+
+**Change starting ID:**
+
+Edit `src/common/utils/doc-utils.ts`:
+
+```typescript
+let TEST_ID = 1228; // Change this value
+```
+
+**Change header color:**
+
+```typescript
+shading: {
+  fill: "0E4CB2", // Change hex color
+  type: ShadingType.CLEAR,
+  color: "auto",
+}
+```
 
 ## Development
 
 ### Code Quality Tools
 
-- **ESLint**: Comprehensive linting with TypeScript support
-- **Prettier**: Consistent code formatting
-- **TypeScript**: Strict type checking enabled
-- **Modern ES Modules**: Latest JavaScript features
+- **ESLint:** Linting with TypeScript support
+- **Prettier:** Code formatting
+- **TypeScript:** Strict type checking
+- **Modern ES Modules:** Latest JavaScript features
 
-### Architecture Patterns
+### Build Process
 
-- **Modular Design**: Separated utilities and concerns
-- **Type Safety**: Comprehensive TypeScript interfaces
-- **Error Handling**: Robust error management with retries
-- **Async/Await**: Modern asynchronous programming patterns
+**Tool:** esbuild (fast bundler)
 
-### Testing Considerations
+**Configuration:**
 
-The application includes:
+```javascript
+{
+  bundle: true,
+  platform: "node",
+  format: "esm",
+  external: ["fs", "path", "pizzip", "docx", "groq-sdk", "node-fetch", "dotenv"]
+}
+```
 
-- Input validation for Excel files
-- AI response validation
-- Document generation error handling
-- Network request retry mechanisms
+### Project Commands
+
+```bash
+# Install dependencies
+npm install
+
+# Build for production
+npm run build
+
+# Development mode (watch)
+npm run watch
+
+# Run application
+npm start -- --product=1 --category=1
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
+
+### TypeScript Configuration
+
+**Target:** ES2020
+**Module:** Preserve (ESM)
+**Strict Mode:** Enabled
+**Output:** `./js` directory
+
+### Adding New Features
+
+1. **Create feature branch**
+
+   ```bash
+   git checkout -b feature/new-feature
+   ```
+
+2. **Implement changes**
+   - Add types in `src/common/types.ts`
+   - Add constants in `src/common/constants.ts`
+   - Create utility functions in `src/common/utils/`
+
+3. **Build and test**
+
+   ```bash
+   npm run build
+   npm start -- --product=1 --category=1
+   ```
+
+4. **Commit and push**
+   ```bash
+   git add .
+   git commit -m "feat: add new feature"
+   git push origin feature/new-feature
+   ```
 
 ## Scripts
 
-| Script    | Command         | Description                        |
-| --------- | --------------- | ---------------------------------- |
-| **Start** | `npm start`     | Run the compiled application       |
-| **Build** | `npm run build` | Build for production with esbuild  |
-| **Watch** | `npm run watch` | Development mode with auto-rebuild |
-| **Test**  | `npm test`      | Run test suite (placeholder)       |
+| Script    | Command                                 | Description                         |
+| --------- | --------------------------------------- | ----------------------------------- |
+| **start** | `npm start -- --product=X --category=Y` | Run the application with parameters |
+| **build** | `npm run build`                         | Build TypeScript to JavaScript      |
+| **watch** | `npm run watch`                         | Development mode with auto-rebuild  |
+| **test**  | `npm test`                              | Run test suite (placeholder)        |
 
-## Dependencies
+### Script Details
 
-### Production Dependencies
+**start:**
 
-| Package      | Purpose                                   |
-| ------------ | ----------------------------------------- |
-| **groq-sdk** | AI integration with Groq API              |
-| **docx**     | Word document generation and manipulation |
-| **pizzip**   | ZIP file handling for DOCX operations     |
-| **xlsx**     | Excel file reading and parsing            |
-| **dotenv**   | Environment variable management           |
-| **minimist** | Command line argument parsing             |
+```bash
+NODE_TLS_REJECT_UNAUTHORIZED=0 node index.js
+```
 
-### Development Dependencies
+- Disables SSL verification (development only)
+- Runs compiled JavaScript
 
-| Package                 | Purpose                           |
-| ----------------------- | --------------------------------- |
-| **typescript**          | Type checking and compilation     |
-| **esbuild**             | Fast bundling and compilation     |
-| **eslint**              | Code linting and quality          |
-| **prettier**            | Code formatting                   |
-| **@typescript-eslint/** | TypeScript-specific linting rules |
+**build:**
+
+```bash
+esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm [externals]
+```
+
+- Bundles TypeScript to single JavaScript file
+- Excludes Node.js built-ins and large dependencies
+
+**watch:**
+
+```bash
+esbuild src/index.ts --bundle --outfile=index.js --watch [options]
+```
+
+- Same as build but watches for changes
+- Auto-rebuilds on file save
+
+## Troubleshooting
+
+### Common Issues and Solutions
+
+#### 1. Missing Environment Variables
+
+**Error:**
+
+```
+Missing credentials: TCMS_USER or TCMS_PASSWORD missing in .env
+```
+
+**Solution:**
+
+- Ensure `.env` file exists in project root
+- Verify all required variables are set:
+  ```env
+  GROQ_API_KEY=your_key
+  TCMS_USER=admin
+  TCMS_PASSWORD=your_password
+  DEFAULT_TESTER=admin
+  ```
+
+#### 2. Missing Command Line Parameters
+
+**Error:**
+
+```
+Missing params: -- --product=x --category=y
+```
+
+**Solution:**
+
+- Always provide product and category IDs:
+  ```bash
+  npm start -- --product=1 --category=1
+  ```
+- Find IDs in Kiwi TCMS admin panel
+
+#### 3. Kiwi TCMS Connection Failed
+
+**Error:**
+
+```
+❌ Login failed: Missing: csrftoken sessionid
+```
+
+**Solutions:**
+
+- Verify Kiwi TCMS is running:
+  ```bash
+  docker ps | grep kiwi
+  ```
+- Check credentials in `.env`
+- Ensure Kiwi TCMS is accessible at `https://localhost`
+- Try accessing Kiwi TCMS in browser first
+
+#### 4. Requirements File Not Found
+
+**Error:**
+
+```
+File ./requirements.xlsx wont exist
+```
+
+**Solution:**
+
+- Create `requirements.xlsx` in project root
+- Use `template_requirements_example.xlsx` as reference
+- Ensure file has correct structure (see Template Files section)
+
+#### 5. Groq API Errors
+
+**Error:**
+
+```
+Error while fetching GROQ: [error details]
+```
+
+**Solutions:**
+
+- Verify API key is correct in `.env`
+- Check Groq API status: [https://status.groq.com/](https://status.groq.com/)
+- Ensure you have API credits/quota
+- Check internet connection
+
+#### 6. CSRF Token Mismatch
+
+**Error:**
+
+```
+❌ csrfmiddlewaretoken not found in /cases/new page
+```
+
+**Solutions:**
+
+- Clear browser cookies for Kiwi TCMS
+- Restart Kiwi TCMS Docker container:
+  ```bash
+  docker-compose restart
+  ```
+- Check if Kiwi TCMS version is compatible
+
+#### 7. SSL Certificate Errors
+
+**Error:**
+
+```
+UNABLE_TO_VERIFY_LEAF_SIGNATURE
+```
+
+**Solution:**
+
+- For development, SSL verification is already disabled
+- For production, use valid SSL certificates
+- Configure proper HTTPS in Kiwi TCMS
+
+#### 8. Build Errors
+
+**Error:**
+
+```
+Cannot find module 'xyz'
+```
+
+**Solution:**
+
+- Reinstall dependencies:
+  ```bash
+  rm -rf node_modules package-lock.json
+  npm install
+  ```
+- Ensure Node.js version ≥ 18.x
+
+#### 9. Document Generation Fails
+
+**Error:**
+
+```
+❌ Error merging documents
+```
+
+**Solutions:**
+
+- Check if `original.docx` is corrupted
+- Remove `original.docx` to create new document
+- Ensure write permissions in project directory
+
+#### 10. Test Cases Not Uploading
+
+**Error:**
+
+```
+❌ Error at creating test case: [title]
+```
+
+**Solutions:**
+
+- Verify product and category IDs exist in Kiwi TCMS
+- Check user permissions in Kiwi TCMS
+- Ensure `DEFAULT_TESTER` user exists
+- Review Kiwi TCMS logs:
+  ```bash
+  docker-compose logs -f
+  ```
+
+### Debug Mode
+
+Enable detailed logging:
+
+```bash
+# Add to your command
+DEBUG=* npm start -- --product=1 --category=1
+```
+
+### Getting Help
+
+If issues persist:
+
+1. Check [Kiwi TCMS Documentation](https://kiwitcms.readthedocs.io/)
+2. Review [Groq API Documentation](https://console.groq.com/docs)
+3. Open an issue: [GitHub Issues](https://github.com/Strako/Generate-testcases-and-docs/issues)
+4. Include:
+   - Error message
+   - Steps to reproduce
+   - Environment details (Node version, OS)
+   - Relevant logs
 
 ## Contributing
 
 ### Development Setup
 
-1. **Fork and clone** the repository
-2. **Install dependencies**: `npm install`
-3. **Set up environment**: Copy `.env.example` to `.env`
-4. **Add API key**: Get Groq API key and add to `.env`
-5. **Run in development**: `npm run watch`
+1. **Fork the repository**
+
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/Generate-testcases-and-docs.git
+   cd Generate-testcases-and-docs
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment**
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your credentials
+   ```
+
+4. **Create feature branch**
+
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+
+5. **Make changes and test**
+
+   ```bash
+   npm run build
+   npm start -- --product=1 --category=1
+   ```
+
+6. **Commit changes**
+
+   ```bash
+   git add .
+   git commit -m "feat: add amazing feature"
+   ```
+
+7. **Push and create PR**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
 
 ### Code Standards
 
-- Follow TypeScript best practices
-- Use ESLint and Prettier configurations
-- Include comprehensive type annotations
-- Write descriptive commit messages
-- Test with sample requirements files
+- **TypeScript:** Use strict typing
+- **ESLint:** Follow linting rules
+- **Prettier:** Format code before commit
+- **Commits:** Use conventional commits (feat:, fix:, docs:, etc.)
+- **Documentation:** Update README for new features
 
-### Pull Request Process
+### Pull Request Guidelines
 
-1. Create feature branch from main
-2. Implement changes with proper typing
-3. Test with sample Excel files
-4. Update documentation if needed
-5. Submit PR with detailed description
+✅ **Before submitting:**
+
+- Code builds without errors
+- All existing functionality works
+- New features are documented
+- Code follows project style
+- No sensitive data in commits
+
+📝 **PR Description should include:**
+
+- What changes were made
+- Why the changes were needed
+- How to test the changes
+- Screenshots (if UI changes)
+
+### Areas for Contribution
+
+- 🐛 Bug fixes
+- ✨ New features
+- 📚 Documentation improvements
+- 🧪 Test coverage
+- 🎨 UI/UX improvements
+- 🌐 Internationalization
+- ⚡ Performance optimizations
+
+## License
+
+This project is licensed under the **ISC License**.
+
+```
+ISC License
+
+Copyright (c) 2024
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+```
 
 ---
 
-**Repository**: [Generate-testcases-and-docs](https://github.com/Strako/Generate-testcases-and-docs)
+## Quick Start Summary
 
-**Issues**: [Report bugs or request features](https://github.com/Strako/Generate-testcases-and-docs/issues)
+```bash
+# 1. Clone and install
+git clone https://github.com/Strako/Generate-testcases-and-docs.git
+cd Generate-testcases-and-docs
+npm install
 
-**License**: ISC License
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your credentials
+
+# 3. Prepare requirements
+# Create requirements.xlsx with your requirements
+
+# 4. Build
+npm run build
+
+# 5. Run
+npm start -- --product=1 --category=1
+```
+
+---
+
+## Links and Resources
+
+- 📦 **Repository:** [GitHub](https://github.com/Strako/Generate-testcases-and-docs)
+- 🐛 **Issues:** [Report Bugs](https://github.com/Strako/Generate-testcases-and-docs/issues)
+- 🥝 **Kiwi TCMS:** [Official Site](https://kiwitcms.org/)
+- 🐳 **Kiwi Docker:** [Installation Guide](https://kiwitcms.readthedocs.io/en/latest/installing_docker.html)
+- 🤖 **Groq AI:** [Console](https://console.groq.com/)
+- 📚 **Documentation:** [Kiwi TCMS Docs](https://kiwitcms.readthedocs.io/)
+
+---
+
+**Made with ❤️ for QA Engineers**
+
+_Automate your test case generation and focus on what matters: quality assurance._
