@@ -1,0 +1,49 @@
+{
+  "name": "generate-testcases-and-docs",
+  "version": "2.0.0",
+  "description": "",
+  "homepage": "https://github.com/Strako/Generate-testcases-and-docs#readme",
+  "bugs": {
+    "url": "https://github.com/Strako/Generate-testcases-and-docs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Strako/Generate-testcases-and-docs.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_TLS_REJECT_UNAUTHORIZED=0 node index.js",
+    "watch": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv --watch",
+    "build": "esbuild src/index.ts --bundle --outfile=index.js --platform=node --format=esm --external:fs --external:path --external:pizzip --external:docx --external:groq-sdk --external:node-fetch --external:dotenv"
+  },
+  "dependencies": {
+    "docx": "^9.5.1",
+    "docxtemplater": "^3.66.7",
+    "dotenv": "^17.2.3",
+    "fs": "^0.0.1-security",
+    "groq-sdk": "^0.34.0",
+    "minimist": "^1.2.8",
+    "node-fetch": "^3.3.2",
+    "pizzip": "^3.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.27.0",
+    "@types/minimist": "^1.2.5",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "esbuild": "^0.25.11",
+    "eslint": "^9.27.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "globals": "^16.2.0",
+    "prettier": "^3.5.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  }
+}
